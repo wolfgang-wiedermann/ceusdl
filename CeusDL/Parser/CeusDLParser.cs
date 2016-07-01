@@ -1,17 +1,20 @@
 using System;
 using System.IO;
+using Kdv.CeusDL.Parser.TmpModel;
 using static Kdv.CeusDL.Parser.CeusDLParserState;
 
 namespace Kdv.CeusDL.Parser
 {
     public class CeusDLParser {
 
-        ParserResult result = new ParserResult();
+        TmpParserResult result = new TmpParserResult();
+        TmpInterface currentInterface = new TmpInterface();
+        TmpInterfaceAttribute currentInterfaceAttribute = new TmpInterfaceAttribute();
         CeusDLParserState state = CeusDLParserState.INITIAL;
         string buf = "";
 
         public ParserResult Parse(string code) {
-            result = new ParserResult();
+            result = new TmpParserResult();
             state = CeusDLParserState.INITIAL;
             buf = "";
 
@@ -36,7 +39,8 @@ namespace Kdv.CeusDL.Parser
                 }
             }
 
-            return result;
+            // TODO neu setzen...
+            return null;
         }
 
         public ParserResult ParseFile(string fileName) {
@@ -79,6 +83,9 @@ namespace Kdv.CeusDL.Parser
                 Console.WriteLine(buf);
                 switch(buf) {
                     case "interface":
+                        this.currentInterface = new TmpInterface();
+                        // TODO: evtl. erst am Ende des Interfaces ...
+                        this.result.Interfaces.Add(this.currentInterface);
                         this.state = IN_INTERFACE_NAME;
                         break;
                     case "attribute":
@@ -105,6 +112,7 @@ namespace Kdv.CeusDL.Parser
             } else if(c == '{') {
                 // Wechsel zu Interface-Body
                 Console.WriteLine($"InterfaceName: {buf}");
+                this.currentInterface.Name = buf;
                 buf = "";
                 this.state = IN_INTERFACE_BODY;
             } else if(IsValidObjectNameChar(c)) {

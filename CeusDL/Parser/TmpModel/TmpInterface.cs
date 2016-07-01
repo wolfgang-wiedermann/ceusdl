@@ -1,7 +1,10 @@
+using System.Collections.Generic;
+
 namespace Kdv.CeusDL.Parser.TmpModel
 {
     internal class TmpInterface {
         public string Name {get;set;}
-        // TODO: hier gehts weiter !!!
+        public List<TmpInterfaceAttribute> Attributes {get;set;}
+        
     }
 }
