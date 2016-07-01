@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Kdv.CeusDL.Parser;
 
 namespace ConsoleApplication
@@ -11,7 +12,7 @@ namespace ConsoleApplication
             Console.WriteLine("------------");
 
             var parser = new CeusDLParser();
-            parser.Parse("");
+            parser.ParseFile(Path.Combine(".", "dsl", "interfacesample.ceusdl"));
         }
     }
 }
