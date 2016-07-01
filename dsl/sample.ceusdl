@@ -61,10 +61,24 @@ attribute Raumnutzungsart(lookup="Raumnutzungsart") {
 
 // 3. Metrik-Definitionen
 
-metric RaumFlaeche {
-    // ? src-Array, da Metriken evtl. ja auch 
-    // über verschiedene Tabellen aufgelöst werden können ?
+// TODO:
+// Es gibt Basismetriken (type="Basic") und abgeleitete Metriken (type="Formula")
+// Basismetriken können z. B. durch Filter eingeschränkt werden,
+// da muss ich mir noch überlegen, wie ich das einbaue!
+
+metric RaumFlaeche(type="Basic") {
+    // label: Sprechender Name in Microstrategy
+    label:"Fläche";
+    // Aggregationsfunktion festlegen (sum, count, max, min, avg)
+    function:sum;
+    // ? src-Array, da der Fakt einer Metrik evtl. ja auch 
+    // über verschiedene Tabellen aufgelöst werden kann ?
     src:[
         Raum.FLAECHE;
     ];
+}
+
+metric RaumVolumen(type="Formula") {
+    label:"Volumen";
+    formula:RaumFlaeche*2.5; // Annahme: Alle Räume sind exakt 2.50m hoch
 }
