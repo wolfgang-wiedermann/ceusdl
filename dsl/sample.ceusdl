@@ -1,5 +1,7 @@
 // Beispiel in CEUS-Definition-Language
 
+// 1. Interface Definitionen
+
 interface Raum {
     // Standard-Attributfelder
     base KNZ:varchar(len="50", primary_key="true");
@@ -25,3 +27,37 @@ interface Raumnutzungsart {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
 }
+
+// 2. Attribut-Definitionen
+
+attribute Raum(lookup="Raum") {
+    fields:[
+        KNZ:Raum.KNZ;
+        KURZBEZ:Raum.KURZBEZ;
+        LANGBEZ:Raum.LANGBEZ;
+        FLAECHE:Raum.FLAECHE;
+    ];
+    parents:[
+        Gebaeude;
+        Raumnutzungsart;
+    ];
+}
+
+attribute Gebaeude(lookup="Gebaeude") {
+    fields:[
+        KNZ:Gebaeude.KNZ;
+        KURZBEZ:Gebaeude.KURZBEZ;
+        LANGBEZ:Gebaeude.LANGBEZ;
+    ];
+}
+
+attribute Raumnutzungsart(lookup="Raumnutzungsart") {
+    fields:[
+        KNZ:Raumnutzungsart.KNZ;
+        KURZBEZ:Raumnutzungsart.KURZBEZ;
+        LANGBEZ:Raumnutzungsart.LANGBEZ;
+    ];
+}
+
+// 3. Metrik-Definitionen
+
