@@ -11,7 +11,7 @@ interface Raum {
     base FLAECHE:decimal(len="12,2", unit="Quadratmeter");
     // Referenzen zu anderen Attributen
     ref Gebaeude.KNZ;
-    ref.Raumnutzungsart.KNZ
+    ref Raumnutzungsart.KNZ
 }
 
 interface Gebaeude {
