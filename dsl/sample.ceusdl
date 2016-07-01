@@ -1,0 +1,27 @@
+// Beispiel in CEUS-Definition-Language
+
+interface Raum {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    // Fakt-Felder
+    base FLAECHE:decimal(len="12,2", unit="Quadratmeter");
+    // Referenzen zu anderen Attributen
+    ref Gebaeude.KNZ;
+    ref.Raumnutzungsart.KNZ
+}
+
+interface Gebaeude {
+    // Standard-Attributfelder 
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Raumnutzungsart {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
