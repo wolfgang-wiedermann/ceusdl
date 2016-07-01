@@ -61,3 +61,10 @@ attribute Raumnutzungsart(lookup="Raumnutzungsart") {
 
 // 3. Metrik-Definitionen
 
+metric RaumFlaeche {
+    // ? src-Array, da Metriken evtl. ja auch 
+    // über verschiedene Tabellen aufgelöst werden können ?
+    src:[
+        Raum.FLAECHE;
+    ];
+}
