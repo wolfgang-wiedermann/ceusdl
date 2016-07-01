@@ -68,6 +68,18 @@ namespace Kdv.CeusDL.Parser
                     case IN_INTERFACE_PARAM_UNIT_VALUE:
                         onInInterfaceParamUnitValue(i, code);
                         break;
+                    case IN_INTERFACE_ATTRIBUTE_FOREIGN_IFA:
+                        onInInterfaceAttributeForeignIfa(i, code);
+                        break;
+                    case IN_INTERFACE_ATTRIBUTE_REFERENCED_FIELD:
+                        onInInterfaceAttributeReferencedField(i, code);
+                        break;
+                    case BEFORE_INTERFACE_ATTRIBUTE_ALIAS:
+                        onBeforeInterfaceAttributeAlias(i, code);
+                        break;
+                    case IN_INTERFACE_ATTRIBUTE_ALIAS:
+                        onInInterfaceAttributeAlias(i, code);
+                        break;
                     default:
                         Console.WriteLine($"Reached unhandled State {state}");
                         return null;
@@ -181,11 +193,15 @@ namespace Kdv.CeusDL.Parser
                     case "ref":
                         this.currentInterfaceAttribute = new TmpInterfaceAttribute();
                         this.currentInterface.Attributes.Add(this.currentInterfaceAttribute);
-                        this.currentInterfaceAttribute.AttributeType = TmpInterfaceAttributeType.REF;                            break;
+                        this.currentInterfaceAttribute.AttributeType = TmpInterfaceAttributeType.REF;
+                        this.state = IN_INTERFACE_ATTRIBUTE_FOREIGN_IFA;                            break;
                     default:
                         throw new InvalidTokenException(buf);
                 }
                 buf = "";
+            } else if(c == '}') {
+                buf = "";
+                this.state = INITIAL;
             } else {
                 buf += c;
             }
@@ -341,6 +357,67 @@ namespace Kdv.CeusDL.Parser
             char c = code[pos];
             if(c == ';') {
                 this.state = IN_INTERFACE_BODY;
+            }
+        }
+
+        private void onInInterfaceAttributeForeignIfa(int pos, string code) {
+            char c = code[pos];
+            if(c == '.') {
+                Console.WriteLine($"Foreign Ifa  : {buf}");
+                this.currentInterfaceAttribute.ForeignInterface = buf;
+                buf = "";
+                this.state = IN_INTERFACE_ATTRIBUTE_REFERENCED_FIELD;
+            } else if (IsValidObjectNameChar(c)) {
+                buf += c;
+            } else if(!IsWhitespaceChar(c)) {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceAttributeReferencedField(int pos, string code) {
+            char c = code[pos];
+            if(c == ';') {
+                Console.WriteLine($"ReferencedFld: {buf}");
+                this.state = IN_INTERFACE_BODY;
+                this.currentInterfaceAttribute.ReferencedField = buf;
+                buf = "";
+            } else if(IsValidObjectNameChar(c)) {
+                buf += c;
+            } else if(IsWhitespaceChar(c)) {
+                Console.WriteLine($"ReferencedFld: {buf}");
+                this.state = BEFORE_INTERFACE_ATTRIBUTE_ALIAS;
+                this.currentInterfaceAttribute.ReferencedField = buf;
+                buf = "";
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onBeforeInterfaceAttributeAlias(int pos, string code) {
+            char c = code[pos];
+            if(c == 'a' || c == 's') {
+                buf += c;
+            } else if(buf.Equals(buf) && IsWhitespaceChar(c)) {
+                buf = "";
+                this.state = IN_INTERFACE_ATTRIBUTE_ALIAS;
+            } else if(buf.Length == 0 && IsWhitespaceChar(c)) {
+                // Ignorieren
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceAttributeAlias(int pos, string code) {
+            char c = code[pos];
+            if(c == ';') {
+                Console.WriteLine($"IntAttributeA: {buf}");
+                this.currentInterfaceAttribute.As = buf;
+                buf = "";
+                this.state = IN_INTERFACE_BODY;
+            } else if(IsValidObjectNameChar(c)) {
+                buf += c;
+            } else if (!(IsWhitespaceChar(c) && buf.Length == 0)){
+                throw new InvalidCharacterException(c);
             }
         }
             
