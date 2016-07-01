@@ -32,6 +32,42 @@ namespace Kdv.CeusDL.Parser
                     case IN_INTERFACE_NAME:
                         onInInterfaceName(i, code);
                         break;
+                    case IN_INTERFACE_BODY:
+                        onInInterfaceBody(i, code);
+                        break;
+                    case IN_INTERFACE_COMMENT:
+                        onInInterfaceComment(i, code);
+                        break;
+                    case IN_INTERFACE_ATTRIBUTE_NAME:
+                        onInInterfaceAttributeName(i, code);
+                        break;
+                    case IN_INTERFACE_ATTRIBUTE_TYPE:
+                        onInInterfaceAttributeType(i, code);
+                        break;
+                    case IN_INTERFACE_PARAM_LIST:
+                        onInInterfaceParamList(i, code);
+                        break;
+                    case IN_INTERFACE_PARAM_LEN:
+                        onInInterfaceParamLen(i, code);
+                        break;
+                    case IN_INTERFACE_PARAM_LEN_VALUE:
+                        onInInterfaceParamLenValue(i, code);
+                        break;
+                    case IN_INTERFACE_PARAM_PK:
+                        onInInterfaceParamPk(i, code);
+                        break;
+                    case IN_INTERFACE_PARAM_PK_VALUE:
+                        onInInterfaceParamPkValue(i, code);
+                        break;
+                    case BEHIND_INTERFACE_PARAM_LIST:
+                        onBehindInterfaceParamList(i, code);
+                        break;
+                    case IN_INTERFACE_PARAM_UNIT:
+                        onInInterfaceParamUnit(i, code);
+                        break;
+                    case IN_INTERFACE_PARAM_UNIT_VALUE:
+                        onInInterfaceParamUnitValue(i, code);
+                        break;
                     default:
                         Console.WriteLine($"Reached unhandled State {state}");
                         return null;
@@ -121,6 +157,192 @@ namespace Kdv.CeusDL.Parser
                 throw new InvalidCharacterException(c);
             }
         }
+
+        private void onInInterfaceBody(int pos, string code) {
+            char c = code[pos];
+            if(c == '/' && buf.Length == 0) {
+                if(code[pos-1] == '/') {
+                    this.state = IN_INTERFACE_COMMENT;
+                } else if(!IsWhitespaceChar(code[pos-1])) {
+                    throw new InvalidTokenException(code[pos-1]+"/");
+                } 
+            } else if(IsWhitespaceChar(c) && buf.Length == 0) {
+                // Leerzeichen vor dem nächsten Token ignorieren
+            } else if(IsWhitespaceChar(c) && buf.Length > 0) {
+                // Leerzeichen nach dem nächsten Token!
+                Console.WriteLine($"AttributeType: {buf}");
+                switch(buf) {
+                    case "base":
+                        this.currentInterfaceAttribute = new TmpInterfaceAttribute();
+                        this.currentInterface.Attributes.Add(this.currentInterfaceAttribute);
+                        this.currentInterfaceAttribute.AttributeType = TmpInterfaceAttributeType.BASE;
+                        this.state = IN_INTERFACE_ATTRIBUTE_NAME;
+                        break;
+                    case "ref":
+                        this.currentInterfaceAttribute = new TmpInterfaceAttribute();
+                        this.currentInterface.Attributes.Add(this.currentInterfaceAttribute);
+                        this.currentInterfaceAttribute.AttributeType = TmpInterfaceAttributeType.REF;                            break;
+                    default:
+                        throw new InvalidTokenException(buf);
+                }
+                buf = "";
+            } else {
+                buf += c;
+            }
+        }
+
+        private void onInInterfaceComment(int pos, string code) {
+            char c = code[pos];
+            if(c == '\n') {
+                this.state = IN_INTERFACE_BODY;
+            } 
+        }
+
+        private void onInInterfaceAttributeName(int pos, string code) {
+            char c = code[pos];
+            if(c == ':') {
+                Console.WriteLine($"AttributeName: {buf}");
+                this.currentInterfaceAttribute.Name = buf;
+                buf = "";
+                this.state = IN_INTERFACE_ATTRIBUTE_TYPE;
+            } else if (!(IsWhitespaceChar(c) && buf.Length > 0)) {
+                buf += c;
+            } else {
+                new InvalidCharacterException(' ');
+            }
+        }
+
+        private void onInInterfaceAttributeType(int pos, string code) {
+            char c = code[pos];
+            if(c == '(') {
+                // wechsel in Parameterliste
+                Console.WriteLine($"DataType     : {buf}");
+                this.currentInterfaceAttribute.DataType = buf;
+                buf = "";
+                this.state = IN_INTERFACE_PARAM_LIST;
+            } else if (c == ';') {
+                // Attribut abschließen
+                this.currentInterfaceAttribute.DataType = buf;
+                buf = "";
+                this.state = IN_INTERFACE_BODY;
+            } else if (IsWhitespaceChar(c)) {
+                // Ignorieren, später sicherstellen dass keine Lücken im Typbezeichner sind
+            } else if (IsValidObjectNameChar(c)) {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceParamList(int pos, string code) {
+            char c = code[pos];
+            if(c == '=') {
+                switch(buf) {
+                    case "len":
+                        this.state = IN_INTERFACE_PARAM_LEN;
+                        break;
+                    case "primary_key":
+                        this.state = IN_INTERFACE_PARAM_PK;
+                        break;
+                    case "unit":
+                        this.state = IN_INTERFACE_PARAM_UNIT;
+                        break;
+                    default:
+                        throw new InvalidTokenException(buf);
+                }
+                buf = "";
+            } else if (IsValidObjectNameChar(c)) {
+                buf += c;
+            } 
+        }
+
+        private void onInInterfaceParamLen(int pos, string code) {
+            char c = code[pos];
+            if(c == ',') {
+                this.state = IN_INTERFACE_PARAM_LIST;
+            } else if(c == ')') {
+                this.state = BEHIND_INTERFACE_PARAM_LIST;
+            } else if(c == '"') {
+                this.state = IN_INTERFACE_PARAM_LEN_VALUE;
+            } else if(!IsWhitespaceChar(c)) {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceParamLenValue(int pos, string code) {
+            char c = code[pos];
+            if(c == '"' && buf.Length > 0) {
+                Console.WriteLine($"Length       : {buf}");
+                this.state = IN_INTERFACE_PARAM_LEN;
+                this.currentInterfaceAttribute.Length = buf;
+                buf = "";
+            } else if(IsValidNumber(c) || c == ',') {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceParamPk(int pos, string code) {
+            char c = code[pos];
+            if(c == ',') {
+                this.state = IN_INTERFACE_PARAM_LIST;
+            } else if(c == ')') {
+                this.state = BEHIND_INTERFACE_PARAM_LIST;
+            } else if(c == '"') {
+                this.state = IN_INTERFACE_PARAM_PK_VALUE;
+            } else if(!IsWhitespaceChar(c)) {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceParamPkValue(int pos, string code) {
+            char c = code[pos];
+            if(c == '"' && buf.Length > 0) {
+                Console.WriteLine($"Primary Key  : {buf}");
+                this.state = IN_INTERFACE_PARAM_PK;
+                this.currentInterfaceAttribute.Length = buf;
+                buf = "";
+            } else if(IsValidLetter(c)) {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceParamUnit(int pos, string code) {
+            char c = code[pos];
+            if(c == ',') {
+                this.state = IN_INTERFACE_PARAM_LIST;
+            } else if(c == ')') {
+                this.state = BEHIND_INTERFACE_PARAM_LIST;
+            } else if(c == '"') {
+                this.state = IN_INTERFACE_PARAM_UNIT_VALUE;
+            } else if(!IsWhitespaceChar(c)) {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceParamUnitValue(int pos, string code) {
+            char c = code[pos];
+            if(c == '"' && buf.Length > 0) {
+                Console.WriteLine($"Unit         : {buf}");
+                this.state = IN_INTERFACE_PARAM_UNIT;
+                this.currentInterfaceAttribute.Length = buf;
+                buf = "";
+            } else if(IsValidLetter(c)) {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onBehindInterfaceParamList(int pos, string code) {
+            char c = code[pos];
+            if(c == ';') {
+                this.state = IN_INTERFACE_BODY;
+            }
+        }
             
         #endregion
         #region HelperFunctions
@@ -146,7 +368,10 @@ namespace Kdv.CeusDL.Parser
         }
 
         private bool IsValidObjectNameChar(char c) {
-            return IsValidNumber(c) || IsValidLetter(c);
+            return IsValidNumber(c) 
+                || IsValidLetter(c)
+                || c == '_'
+                || c == '-';
         }
 
         #endregion

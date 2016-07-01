@@ -8,6 +8,7 @@ namespace Kdv.CeusDL.Parser.TmpModel
     }
     
     internal class TmpInterfaceAttribute {
+        
         public TmpInterfaceAttributeType AttributeType {get;set;}
         // For BASE-Attributes only
         public string Name {get;set;}
