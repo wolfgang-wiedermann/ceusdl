@@ -1,6 +1,7 @@
 using System;
 using System.IO;
 using Kdv.CeusDL.Parser.TmpModel;
+using Kdv.CeusDL.Parser.Model;
 using static Kdv.CeusDL.Parser.CeusDLParserState;
 
 namespace Kdv.CeusDL.Parser
