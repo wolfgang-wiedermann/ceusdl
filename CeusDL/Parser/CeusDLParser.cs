@@ -88,8 +88,8 @@ namespace Kdv.CeusDL.Parser
                 }
             }
 
-            // TODO neu setzen...
-            return null;
+            var converter = new TmpModelConverter(result);
+            return converter.ToParserResult();
         }
 
         public ParserResult ParseFile(string fileName) {
@@ -318,7 +318,7 @@ namespace Kdv.CeusDL.Parser
             if(c == '"' && buf.Length > 0) {
                 Console.WriteLine($"Primary Key  : {buf}");
                 this.state = IN_INTERFACE_PARAM_PK;
-                this.currentInterfaceAttribute.Length = buf;
+                this.currentInterfaceAttribute.PrimaryKey = buf;
                 buf = "";
             } else if(IsValidLetter(c)) {
                 buf += c;
@@ -345,7 +345,7 @@ namespace Kdv.CeusDL.Parser
             if(c == '"' && buf.Length > 0) {
                 Console.WriteLine($"Unit         : {buf}");
                 this.state = IN_INTERFACE_PARAM_UNIT;
-                this.currentInterfaceAttribute.Length = buf;
+                this.currentInterfaceAttribute.Unit = buf;
                 buf = "";
             } else if(IsValidLetter(c)) {
                 buf += c;

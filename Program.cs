@@ -12,7 +12,8 @@ namespace ConsoleApplication
             Console.WriteLine("------------");
 
             var parser = new CeusDLParser();
-            parser.ParseFile(Path.Combine(".", "dsl", "interfacesample.ceusdl"));
+            var result = parser.ParseFile(Path.Combine(".", "dsl", "interfacesample.ceusdl"));
+            Console.WriteLine(result?.ToString());
         }
     }
 }
