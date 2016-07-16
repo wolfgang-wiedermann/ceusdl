@@ -94,7 +94,7 @@ namespace Kdv.CeusDL.Parser {
                 attr.Decimals = null;
                 attr.DataType = InterfaceAttributeDataType.VARCHAR;
             } else if(input.DataType.Equals("int")) {
-                attr.Length = Int32.Parse(input.Length);
+                attr.Length = 0;
                 attr.Decimals = null;
                 attr.DataType = InterfaceAttributeDataType.INT;
             }
