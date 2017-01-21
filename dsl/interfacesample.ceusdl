@@ -28,3 +28,11 @@ interface Raumnutzungsart {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
 }
+
+interface Inventar {
+    base KNZ:varchar(len="50", primary_key="true");
+    ref Raum.KNZ;
+    base LANGBEZ:varchar(len="500");
+    base Nutzungsdauer:int;
+    base Anschaffungsdatum:varchar(len="20");
+}

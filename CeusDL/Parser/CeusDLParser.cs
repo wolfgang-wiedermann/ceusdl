@@ -129,7 +129,7 @@ namespace Kdv.CeusDL.Parser
             char c = code[pos];
             if(IsWhitespaceChar(c)) {
                 // DEBUG:
-                Console.WriteLine(buf);
+                //Console.WriteLine(buf);
                 switch(buf) {
                     case "interface":
                         this.currentInterface = new TmpInterface();
@@ -160,7 +160,7 @@ namespace Kdv.CeusDL.Parser
                 // Ignorieren: TODO: Blanks in Namen verbieten!
             } else if(c == '{') {
                 // Wechsel zu Interface-Body
-                Console.WriteLine($"InterfaceName: {buf}");
+                //Console.WriteLine($"InterfaceName: {buf}");
                 this.currentInterface.Name = buf;
                 buf = "";
                 this.state = IN_INTERFACE_BODY;
@@ -183,7 +183,7 @@ namespace Kdv.CeusDL.Parser
                 // Leerzeichen vor dem nächsten Token ignorieren
             } else if(IsWhitespaceChar(c) && buf.Length > 0) {
                 // Leerzeichen nach dem nächsten Token!
-                Console.WriteLine($"AttributeType: {buf}");
+                // Console.WriteLine($"AttributeType: {buf}");
                 switch(buf) {
                     case "base":
                         this.currentInterfaceAttribute = new TmpInterfaceAttribute();
@@ -218,7 +218,7 @@ namespace Kdv.CeusDL.Parser
         private void onInInterfaceAttributeName(int pos, string code) {
             char c = code[pos];
             if(c == ':') {
-                Console.WriteLine($"AttributeName: {buf}");
+                //Console.WriteLine($"AttributeName: {buf}");
                 this.currentInterfaceAttribute.Name = buf;
                 buf = "";
                 this.state = IN_INTERFACE_ATTRIBUTE_TYPE;
@@ -233,7 +233,7 @@ namespace Kdv.CeusDL.Parser
             char c = code[pos];
             if(c == '(') {
                 // wechsel in Parameterliste
-                Console.WriteLine($"DataType     : {buf}");
+                // Console.WriteLine($"DataType     : {buf}");
                 this.currentInterfaceAttribute.DataType = buf;
                 buf = "";
                 this.state = IN_INTERFACE_PARAM_LIST;
@@ -289,7 +289,7 @@ namespace Kdv.CeusDL.Parser
         private void onInInterfaceParamLenValue(int pos, string code) {
             char c = code[pos];
             if(c == '"' && buf.Length > 0) {
-                Console.WriteLine($"Length       : {buf}");
+                // Console.WriteLine($"Length       : {buf}");
                 this.state = IN_INTERFACE_PARAM_LEN;
                 this.currentInterfaceAttribute.Length = buf;
                 buf = "";
@@ -316,7 +316,7 @@ namespace Kdv.CeusDL.Parser
         private void onInInterfaceParamPkValue(int pos, string code) {
             char c = code[pos];
             if(c == '"' && buf.Length > 0) {
-                Console.WriteLine($"Primary Key  : {buf}");
+                // Console.WriteLine($"Primary Key  : {buf}");
                 this.state = IN_INTERFACE_PARAM_PK;
                 this.currentInterfaceAttribute.PrimaryKey = buf;
                 buf = "";
@@ -343,7 +343,7 @@ namespace Kdv.CeusDL.Parser
         private void onInInterfaceParamUnitValue(int pos, string code) {
             char c = code[pos];
             if(c == '"' && buf.Length > 0) {
-                Console.WriteLine($"Unit         : {buf}");
+                // Console.WriteLine($"Unit         : {buf}");
                 this.state = IN_INTERFACE_PARAM_UNIT;
                 this.currentInterfaceAttribute.Unit = buf;
                 buf = "";
@@ -364,7 +364,7 @@ namespace Kdv.CeusDL.Parser
         private void onInInterfaceAttributeForeignIfa(int pos, string code) {
             char c = code[pos];
             if(c == '.') {
-                Console.WriteLine($"Foreign Ifa  : {buf}");
+                // Console.WriteLine($"Foreign Ifa  : {buf}");
                 this.currentInterfaceAttribute.ForeignInterface = buf;
                 buf = "";
                 this.state = IN_INTERFACE_ATTRIBUTE_REFERENCED_FIELD;
@@ -378,14 +378,14 @@ namespace Kdv.CeusDL.Parser
         private void onInInterfaceAttributeReferencedField(int pos, string code) {
             char c = code[pos];
             if(c == ';') {
-                Console.WriteLine($"ReferencedFld: {buf}");
+                // Console.WriteLine($"ReferencedFld: {buf}");
                 this.state = IN_INTERFACE_BODY;
                 this.currentInterfaceAttribute.ReferencedField = buf;
                 buf = "";
             } else if(IsValidObjectNameChar(c)) {
                 buf += c;
             } else if(IsWhitespaceChar(c)) {
-                Console.WriteLine($"ReferencedFld: {buf}");
+                // Console.WriteLine($"ReferencedFld: {buf}");
                 this.state = BEFORE_INTERFACE_ATTRIBUTE_ALIAS;
                 this.currentInterfaceAttribute.ReferencedField = buf;
                 buf = "";
@@ -411,7 +411,7 @@ namespace Kdv.CeusDL.Parser
         private void onInInterfaceAttributeAlias(int pos, string code) {
             char c = code[pos];
             if(c == ';') {
-                Console.WriteLine($"IntAttributeA: {buf}");
+                // Console.WriteLine($"IntAttributeA: {buf}");
                 this.currentInterfaceAttribute.As = buf;
                 buf = "";
                 this.state = IN_INTERFACE_BODY;

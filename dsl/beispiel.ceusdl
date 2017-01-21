@@ -1,0 +1,59 @@
+// ------------------------------------
+// Beispiel in CEUS-Definition-Language
+// ------------------------------------
+// 1. Interface Definitionen
+
+interface Raum {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    // Fakt-Felder
+    base FLAECHE:decimal(len="12,2", unit="Quadratmeter");
+    // Referenzen zu anderen Attributen
+    ref Gebaeude.KNZ;
+    ref Raumnutzungsart.KNZ;
+    ref Gebaeude.KNZ as Nachbargebaeude;
+}
+
+interface Gebaeude {
+    // Standard-Attributfelder 
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Raumnutzungsart {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+// --------------------------------------
+// Beispiel in CEUS Modification Language
+// -------------------------------------- 
+
+alter interface Raum remove ref Nachbargebaeude;
+alter interface Raum add ref Gebaeude.KNZ as NachbargebaeudeRechts;
+alter interface Raum modify base KNZ(len="55", primary_key="true");
+alter interface Raum remove base KNZ;
+alter interface Raum add base KNZ(len="55", primary_key="true");
+
+show alter interface Raum add ref Gebaeude.KNZ as NachbargebaeudeLinks;
+
+drop interface Raum;
+show drop interface Raum;
+
+create interface Raum {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    // Fakt-Felder
+    base FLAECHE:decimal(len="12,2", unit="Quadratmeter");
+    // Referenzen zu anderen Attributen
+    ref Gebaeude.KNZ;
+    ref Raumnutzungsart.KNZ;
+    ref Gebaeude.KNZ as Nachbargebaeude;
+}
