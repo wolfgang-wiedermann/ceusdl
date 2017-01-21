@@ -2,6 +2,7 @@ using Kdv.CeusDL.Parser.Model;
 using System;
 
 namespace Kdv.CeusDL.Generator {
+
 public class CeusDLGenerator : IGenerator {
     public string GenerateCode(ParserResult model) {
         string str = "";
@@ -15,7 +16,6 @@ public class CeusDLGenerator : IGenerator {
         string str = $"interface {ifa.Name} ";
         str += "{\n";
         foreach(var attr in ifa.Attributes) {
-            // ... 
             str += GenerateAttrCode(attr);
         }
         str += "}\n\n";
@@ -27,7 +27,6 @@ public class CeusDLGenerator : IGenerator {
         if(attr is InterfaceBasicAttribute) {
             // BaseAttribut
             var a = (InterfaceBasicAttribute) attr;
-            // TODO: das mit dem DataType ist so noch murks, der muss richtig formatiert werden!
             str = $"    base {a.Name}:";
             switch(a.DataType) {
                 case InterfaceAttributeDataType.VARCHAR:
