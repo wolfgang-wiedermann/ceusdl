@@ -56,11 +56,17 @@ namespace Kdv.CeusDL.Parser {
         private Interface ToInterface(TmpInterface input) {
             var ifa = new Interface();
             ifa.Name = input.Name;
+            // Attribute übernehmen
             foreach(var tmpAttr in input.Attributes) {
                 var attr = ToInterfaceAttribute(tmpAttr);
                 attr.ParentInterface = ifa;
                 ifa.Attributes.Add(attr);
             }
+            // Primärschlüssel ermitteln
+            ifa.KeyAttributes.AddRange(ifa.Attributes.Where(a => a is InterfaceBasicAttribute)
+                                              .Select(a => (InterfaceBasicAttribute)a)
+                                              .Where(a => a.PrimaryKey));
+
             return ifa;
         }
 
@@ -97,6 +103,18 @@ namespace Kdv.CeusDL.Parser {
                 attr.Length = 0;
                 attr.Decimals = null;
                 attr.DataType = InterfaceAttributeDataType.INT;
+            } else if(input.DataType.Equals("date")) {
+                attr.Length = 0;
+                attr.Decimals = null;
+                attr.DataType = InterfaceAttributeDataType.DATE;
+            } else if(input.DataType.Equals("time")) {
+                attr.Length = 0;
+                attr.Decimals = null;
+                attr.DataType = InterfaceAttributeDataType.TIME;
+            }  else if(input.DataType.Equals("datetime")) {
+                attr.Length = 0;
+                attr.Decimals = null;
+                attr.DataType = InterfaceAttributeDataType.DATETIME;
             }
             // PrimaryKey
             if(input.PrimaryKey == "true") {

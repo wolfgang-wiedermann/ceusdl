@@ -5,8 +5,11 @@ namespace Kdv.CeusDL.Parser.Model {
         public string Name {get;set;}
         public List<InterfaceAttribute> Attributes {get;set;}
 
+        public List<InterfaceBasicAttribute> KeyAttributes {get; set;}
+
         public Interface() {
             this.Attributes = new List<InterfaceAttribute>();
+            this.KeyAttributes = new List<InterfaceBasicAttribute>();
         }  
 
         public override string ToString() {

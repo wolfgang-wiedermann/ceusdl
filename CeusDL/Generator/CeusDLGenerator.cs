@@ -26,8 +26,7 @@ public class CeusDLGenerator : IGenerator {
         string str = "";
         if(attr is InterfaceBasicAttribute) {
             // BaseAttribut
-            var a = (InterfaceBasicAttribute) attr;
-            // TODO: das mit dem DataType ist so noch murks, der muss richtig formatiert werden!
+            var a = (InterfaceBasicAttribute) attr;            
             str = $"    base {a.Name}:";
             switch(a.DataType) {
                 case InterfaceAttributeDataType.VARCHAR:
@@ -47,6 +46,15 @@ public class CeusDLGenerator : IGenerator {
                     }
                     str += ")";
                     break;
+                case InterfaceAttributeDataType.DATE:
+                    str += $"date";
+                    break;
+                case InterfaceAttributeDataType.TIME:
+                    str += $"time";
+                    break;
+                case InterfaceAttributeDataType.DATETIME:
+                    str += $"datetime";
+                    break;                                                            
                 default:
                     throw new InvalidOperationException($"Ungültiger Datentyp {a.DataType.GetType()}");
             }

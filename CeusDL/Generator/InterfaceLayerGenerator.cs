@@ -44,6 +44,9 @@ namespace Kdv.CeusDL.Generator {
             return code;
         }
 
+        ///
+        /// Übersetzung der Datentypen => Achtung in IL werden Datumswerte als Zeichenketten abgebildet!
+        ///
         public string GetTypeFromBasic(InterfaceBasicAttribute basic) {
             string code = "";
             if(basic.DataType == InterfaceAttributeDataType.VARCHAR) {
@@ -52,7 +55,13 @@ namespace Kdv.CeusDL.Generator {
                 code += $"decimal({basic.Length},{basic.Decimals})";
             } else if(basic.DataType == InterfaceAttributeDataType.INT) {
                 code += $"int";
-            }
+            } else if(basic.DataType == InterfaceAttributeDataType.DATE) {
+                code += $"varchar(10)";
+            } else if(basic.DataType == InterfaceAttributeDataType.TIME) {
+                code += $"varchar(10)";
+            } else if(basic.DataType == InterfaceAttributeDataType.DATETIME) {
+                code += $"varchar(50)";
+            }            
             return code;
         }
     }

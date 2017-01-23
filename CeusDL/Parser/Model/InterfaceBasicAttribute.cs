@@ -1,6 +1,6 @@
 namespace Kdv.CeusDL.Parser.Model {
     public enum InterfaceAttributeDataType {
-        VARCHAR, INT, DECIMAL
+        VARCHAR, INT, DECIMAL, DATE, TIME, DATETIME
     }
     public class InterfaceBasicAttribute : InterfaceAttribute {
         public string Name {get;set;}

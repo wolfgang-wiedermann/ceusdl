@@ -34,5 +34,5 @@ interface Inventar {
     ref Raum.KNZ;
     base LANGBEZ:varchar(len="500");
     base Nutzungsdauer:int;
-    base Anschaffungsdatum:varchar(len="20");
+    base Anschaffungsdatum:date;
 }
