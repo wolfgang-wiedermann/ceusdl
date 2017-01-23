@@ -1,6 +1,3 @@
-
-using static Kdv.CeusDL.Parser.TmpModel.TmpInterfaceAttributeType;
-
 namespace Kdv.CeusDL.Parser.TmpModel
 {
     internal enum TmpInterfaceAttributeType {
