@@ -31,7 +31,11 @@ public class CeusDLGenerator : IGenerator {
             str = $"    base {a.Name}:";
             switch(a.DataType) {
                 case InterfaceAttributeDataType.VARCHAR:
-                    str += $"varchar(len=\"{a.Length}\")";
+                    str += $"varchar(len=\"{a.Length}\"";
+                    if(a.PrimaryKey) {
+                        str += ", primary_key=\"true\"";
+                    }
+                    str += ")";
                     break;
                 case InterfaceAttributeDataType.INT:
                     str += $"int";
