@@ -1,7 +1,13 @@
 using Kdv.CeusDL.Parser.Model;
 using System;
+using static Kdv.CeusDL.Parser.Model.InterfaceAttributeDataType;
 
 namespace Kdv.CeusDL.Generator {
+
+///
+/// Für echtes Roundtrip Engineering ist eine vernünftige Codegenerierung
+/// aus dem Modell erforderlich
+///
 
 public class CeusDLGenerator : IGenerator {
     public string GenerateCode(ParserResult model) {
@@ -29,13 +35,13 @@ public class CeusDLGenerator : IGenerator {
             var a = (InterfaceBasicAttribute) attr;
             str = $"    base {a.Name}:";
             switch(a.DataType) {
-                case InterfaceAttributeDataType.VARCHAR:
+                case VARCHAR:
                     str += $"varchar(len=\"{a.Length}\")";
                     break;
-                case InterfaceAttributeDataType.INT:
+                case INT:
                     str += $"int";
                     break;
-                case InterfaceAttributeDataType.DECIMAL:
+                case DECIMAL:
                     str += $"decimal(len=\"{a.Length},{a.Decimals}\"";
                     if(!string.IsNullOrEmpty(a.Unit)) {
                         str += $", unit=\"{a.Unit}\"";

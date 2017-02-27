@@ -18,8 +18,11 @@ namespace ConsoleApplication
             var ilGenerator = new InterfaceLayerGenerator();
             Console.WriteLine(ilGenerator.GenerateCode(result));
 
-            var cdlGenerator = new CeusDLGenerator();
-            Console.WriteLine(cdlGenerator.GenerateCode(result));
+            //var cdlGenerator = new CeusDLGenerator();
+            //Console.WriteLine(cdlGenerator.GenerateCode(result));
+
+            var blGenerator = new BaseLayerGenerator();
+            Console.WriteLine(blGenerator.GenerateCode(result));
 
             Console.WriteLine();
         }
