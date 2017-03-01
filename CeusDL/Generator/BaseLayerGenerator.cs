@@ -1,4 +1,5 @@
 using Kdv.CeusDL.Parser.Model;
+using System.Linq;
 
 namespace Kdv.CeusDL.Generator {
     public class BaseLayerGenerator : IGenerator {
@@ -8,9 +9,17 @@ namespace Kdv.CeusDL.Generator {
             foreach(var obj in model.Interfaces) {
                 code += GenerateCreateTableCode(obj);
             }
+
+            code += "--\n-- BaseLayer Views\n--\n\n";
+            foreach(var obj in model.Interfaces) {
+                code += GenerateCreateViewCode(obj);
+            }
             return code;
         }
 
+        ///
+        /// Generierung des gesamten Codes für eine Tabelle/Interface
+        ///
         public string GenerateCreateTableCode(Interface ifa) {
             string code = $"create table {GetTableName(ifa)} (\n";
             code += $"    {ifa.Name}_ID int primary key auto_increment";
@@ -23,8 +32,60 @@ namespace Kdv.CeusDL.Generator {
             return code;
         }
 
+        ///
+        /// Generierung des gesamten Codes für eine Tabelle/Interface
+        ///
+        public string GenerateCreateViewCode(Interface ifa) {
+            var il = new InterfaceLayerGenerator();
+            string code = $"create view {GetTableName(ifa)+"_VW"} as \n";
+            code += $"select bl.{ifa.Name}_ID";
+            foreach(var attr in ifa.Attributes) {
+                if(attr is InterfaceBasicAttribute) {
+                    var basic = (InterfaceBasicAttribute)attr;
+                    code += $",\n    il.{attr.ParentInterface.Name}_{basic.Name}";
+                } else {
+                    var refer = (InterfaceRefAttribute)attr;
+                    if(string.IsNullOrEmpty(refer.Alias)) {
+                        code += $",\n    il.{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
+                    } else {
+                        code += $",\n    il.{refer.Alias}_{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
+                    }
+                }
+                code += $" as {GetAttributeName(attr)}";
+            }
+            code += $"\nfrom IL_{ifa.Name} as il\n";
+            code += $"    left outer join {GetTableName(ifa)} as bl\n";
+            code += $"    on il.{GetILPKField(ifa)} = bl.{GetBLPKField(ifa)};\n\n";
+            return code;
+        }
+
+        ///
+        /// Dem Interface Namen ein BL_ voranstellen
+        ///
         private string GetTableName(Interface ifa) {
             return $"BL_{ifa.Name}";
+        }
+
+        ///
+        /// Get InterfaceLayer Name for Primary Key Field
+        ///
+        private string GetILPKField(Interface ifa) {
+            var pk = ifa.Attributes.Where(i => i is InterfaceBasicAttribute)
+                                   .Select(i => (InterfaceBasicAttribute)i)
+                                   .Where(i => i.PrimaryKey);
+
+            return $"{ifa.Name}_{pk.First().Name}";
+        }
+
+        ///
+        /// Get BaseLayer Name for Primary Key Field
+        ///
+        private string GetBLPKField(Interface ifa) {
+            var pk = ifa.Attributes.Where(i => i is InterfaceBasicAttribute)
+                                   .Select(i => (InterfaceBasicAttribute)i)
+                                   .Where(i => i.PrimaryKey);
+
+            return GetAttributeName(pk.First());
         }
 
         ///
@@ -60,7 +121,11 @@ namespace Kdv.CeusDL.Generator {
             } else if(attr is InterfaceRefAttribute) {
                 var temp = (InterfaceRefAttribute)attr;
                 if(!string.IsNullOrEmpty(temp.Alias)) {
-                    return temp.Alias;
+                    return temp.Alias
+                        +"_"
+                        +temp.ReferencedAttribute.ParentInterface.Name
+                        +"_"
+                        +temp.ReferencedFieldName;
                 } else {
                     return temp.ParentInterface.Name
                         +"_"
