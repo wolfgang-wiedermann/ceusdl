@@ -56,6 +56,7 @@ namespace Kdv.CeusDL.Parser {
         private Interface ToInterface(TmpInterface input) {
             var ifa = new Interface();
             ifa.Name = input.Name;
+            ifa.Type = InterfaceTypeResolver.Get(input.Type);
             foreach(var tmpAttr in input.Attributes) {
                 var attr = ToInterfaceAttribute(tmpAttr);
                 attr.ParentInterface = ifa;
@@ -82,7 +83,7 @@ namespace Kdv.CeusDL.Parser {
 
         private InterfaceBasicAttribute ToInterfaceBasicAttribute(TmpInterfaceAttribute input) {
             var attr = new InterfaceBasicAttribute();
-            attr.Name = input.Name;
+            attr.Name = input.Name;            
             // DataType
             if(input.DataType.Equals("decimal")) {
                 var tokens = input.Length.Split(',');

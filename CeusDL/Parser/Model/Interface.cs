@@ -3,6 +3,7 @@ using System.Collections.Generic;
 namespace Kdv.CeusDL.Parser.Model {
     public class Interface {
         public string Name {get;set;}
+        public InterfaceType Type {get;set;}
         public List<InterfaceAttribute> Attributes {get;set;}
 
         public Interface() {
@@ -10,7 +11,7 @@ namespace Kdv.CeusDL.Parser.Model {
         }  
 
         public override string ToString() {
-            string str = $"Interface\nName: {Name}\n";
+            string str = $"Interface\nName: {Name}\nTyp: {Type}\n";
             foreach(var attr in Attributes) {
                 str += attr.ToString();
             }

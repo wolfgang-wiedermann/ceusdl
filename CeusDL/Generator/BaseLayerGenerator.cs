@@ -7,12 +7,27 @@ namespace Kdv.CeusDL.Generator {
         public string GenerateCode(ParserResult model) {
             string code = "--\n-- BaseLayer\n--\n\n";
             foreach(var obj in model.Interfaces) {
-                code += GenerateCreateTableCode(obj);
+                if(obj.Type == InterfaceType.DIM_TABLE) {
+                    code += GenerateCreateTableCode(obj);
+                } else if(obj.Type == InterfaceType.DIM_VIEW) {
+                    code += "/*\n* Create a View that conforms to the following Table\n*\n* ";
+                    code += GenerateCreateTableCode(obj).Replace("\n", "\n* ");
+                    code += "\n*/\n";
+                } else if(obj.Type == InterfaceType.FACT_TABLE) {
+                    // TODO: Code-Generierung für Faktentabelle programmieren ...
+                    code += GenerateCreateTableCode(obj);
+                }
             }
 
             code += "--\n-- BaseLayer Views\n--\n\n";
             foreach(var obj in model.Interfaces) {
-                code += GenerateCreateViewCode(obj);
+                if(obj.Type == InterfaceType.DIM_TABLE) {
+                    code += GenerateCreateViewCode(obj);
+                } else if(obj.Type == InterfaceType.FACT_TABLE) {
+                    // TODO: Prüfen, ob der code auf bei Faktentabellen passt !!!
+                    code += GenerateCreateViewCode(obj);
+                } 
+                // TODO: hier weiter für die anderen Inteface-Typen
             }
             return code;
         }

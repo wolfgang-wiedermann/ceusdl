@@ -34,6 +34,9 @@ namespace Kdv.CeusDL.Parser
                     case IN_INTERFACE_NAME:
                         onInInterfaceName(i, code);
                         break;
+                    case IN_INTERFACE_TYPE:
+                        onInInterfaceType(i, code);
+                        break;                        
                     case IN_INTERFACE_BODY:
                         onInInterfaceBody(i, code);
                         break;
@@ -159,10 +162,33 @@ namespace Kdv.CeusDL.Parser
             char c = code[pos];
             if(IsWhitespaceChar(c)) {
                 // Ignorieren: TODO: Blanks in Namen verbieten!
+            } else if(c == ':') {
+                // Wechsel zu Interface-Type
+                Log($"InterfaceName: {buf}");
+                this.currentInterface.Name = buf;
+                buf = "";
+                this.state = IN_INTERFACE_TYPE;
             } else if(c == '{') {
                 // Wechsel zu Interface-Body
                 Log($"InterfaceName: {buf}");
                 this.currentInterface.Name = buf;
+                buf = "";
+                this.state = IN_INTERFACE_BODY;
+            } else if(IsValidObjectNameChar(c)) {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceType(int pos, string code) {
+            char c = code[pos];
+            if(IsWhitespaceChar(c)) {
+                // Ignorieren: TODO: Blanks in Namen verbieten!
+            } else if(c == '{') {
+                // Wechsel zu Interface-Body
+                Log($"InterfaceType: {buf}");
+                this.currentInterface.Type = buf;
                 buf = "";
                 this.state = IN_INTERFACE_BODY;
             } else if(IsValidObjectNameChar(c)) {

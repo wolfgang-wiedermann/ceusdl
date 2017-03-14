@@ -5,7 +5,10 @@ namespace Kdv.CeusDL.Generator {
         public string GenerateCode(ParserResult model) {
             string code = "-- Interface Layer\n\n";
             foreach(var obj in model.Interfaces) {
-                code += GenerateILTable(obj);
+                if(obj.Type == InterfaceType.DIM_TABLE 
+                    || obj.Type == InterfaceType.FACT_TABLE) {
+                    code += GenerateILTable(obj);
+                }
             }
             return code;
         }

@@ -10,7 +10,7 @@ namespace ConsoleApplication
         public static void Main(string[] args)
         {
             var parser = new CeusDLParser();
-            var result = parser.ParseFile(Path.Combine(".", "dsl", "interfacesample.ceusdl"));
+            var result = parser.ParseFile(Path.Combine(".", "dsl", "bewerber.ceusdl"));
 
             //Console.WriteLine(result?.ToString());
             //Console.WriteLine();
