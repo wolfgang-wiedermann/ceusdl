@@ -11,6 +11,7 @@ namespace Kdv.CeusDL.Parser
         private static bool isDebug = false;
         TmpParserResult result = new TmpParserResult();
         TmpInterface currentInterface = new TmpInterface();
+        TmpInterfaceTypeAttribute currentTypeAttribute = new TmpInterfaceTypeAttribute();
         TmpInterfaceAttribute currentInterfaceAttribute = new TmpInterfaceAttribute();
         CeusDLParserState state = CeusDLParserState.INITIAL;
         string buf = "";
@@ -36,7 +37,16 @@ namespace Kdv.CeusDL.Parser
                         break;
                     case IN_INTERFACE_TYPE:
                         onInInterfaceType(i, code);
-                        break;                        
+                        break;    
+                    case IN_INTERFACE_TYPE_ATTRIBUTE_NAME:
+                        onInInterfaceTypeAttributeName(i, code);
+                        break;                      
+                    case IN_INTERFACE_TYPE_ATTRIBUTE_VALUE:
+                        onInInterfaceTypeAttributeValue(i, code);
+                        break;
+                    case BEHIND_INTERFACE_TYPE_ATTRIBUTES: // Hinter der ) von IN_INTERFACE_TYPE
+                        onBehindInterfaceTypeAttributes(i, code);
+                        break; 
                     case IN_INTERFACE_BODY:
                         onInInterfaceBody(i, code);
                         break;
@@ -185,10 +195,74 @@ namespace Kdv.CeusDL.Parser
             char c = code[pos];
             if(IsWhitespaceChar(c)) {
                 // Ignorieren: TODO: Blanks in Namen verbieten!
+            } else if(c == '(') {
+                // Wechsel zu Interface-Body
+                Log($"InterfaceType: {buf}");
+                this.currentInterface.Type = buf;
+                buf = "";
+                this.state = IN_INTERFACE_TYPE_ATTRIBUTE_NAME;
             } else if(c == '{') {
                 // Wechsel zu Interface-Body
                 Log($"InterfaceType: {buf}");
                 this.currentInterface.Type = buf;
+                buf = "";
+                this.state = IN_INTERFACE_BODY;
+            } else if(IsValidObjectNameChar(c)) {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceTypeAttributeName(int pos, string code) {
+            char c = code[pos];
+            if(IsWhitespaceChar(c)) {
+                // Ignorieren: TODO: Blanks in Namen verbieten!
+            } else if(c == '=') {
+                // Wechsel zu Interface-Body
+                Log($"InterfaceTypeAttribute.Name: {buf}");
+                this.currentTypeAttribute.Name = buf;
+                buf = "";
+                this.state = IN_INTERFACE_TYPE_ATTRIBUTE_VALUE;
+            } else if(IsValidObjectNameChar(c)) {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceTypeAttributeValue(int pos, string code) {
+            char c = code[pos];
+            if(IsWhitespaceChar(c)) {
+                // Ignorieren: TODO: Blanks in Namen verbieten!
+            } else if(c == ')') {
+                // Wechsel zu Interface-Body
+                Log($"InterfaceTypeAttribute.Value: {buf}");
+                this.currentTypeAttribute.Value = buf;
+                this.currentInterface.TypeAttributes.Add(this.currentTypeAttribute);
+                this.currentTypeAttribute = new TmpInterfaceTypeAttribute();
+                buf = "";
+                this.state = BEHIND_INTERFACE_TYPE_ATTRIBUTES;
+            } else if(c == ',') {
+                // Wechsel zu Interface-Body
+                Log($"InterfaceTypeAttribute.Value: {buf}");
+                this.currentTypeAttribute.Value = buf;
+                this.currentInterface.TypeAttributes.Add(this.currentTypeAttribute);
+                this.currentTypeAttribute = new TmpInterfaceTypeAttribute();
+                buf = "";
+                this.state = IN_INTERFACE_TYPE_ATTRIBUTE_NAME;
+            } else if(IsValidObjectNameChar(c) || c == '.') {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onBehindInterfaceTypeAttributes(int pos, string code) {
+            char c = code[pos];
+            if(IsWhitespaceChar(c)) {
+                // Ignorieren: TODO: Blanks in Namen verbieten!
+            } else if(c == '{') {                
                 buf = "";
                 this.state = IN_INTERFACE_BODY;
             } else if(IsValidObjectNameChar(c)) {

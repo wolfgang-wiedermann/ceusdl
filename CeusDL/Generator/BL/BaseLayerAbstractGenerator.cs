@@ -22,6 +22,17 @@ namespace Kdv.CeusDL.Generator.BL {
         }
 
         ///
+        /// Falls erforderlich Mandant-Spalte hinzufügen
+        ///
+        protected string GetMandantSpalte(Interface ifa) {
+            if(ifa.IsMandantInterface()) {
+                return ",\n    Mandant_KNZ varchar(10) not null";
+            } else {
+                return "";
+            }
+        }
+
+        ///
         /// Get InterfaceLayer Name for Primary Key Field
         ///
         protected string GetILPKField(Interface ifa) {

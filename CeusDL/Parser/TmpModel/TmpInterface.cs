@@ -6,13 +6,16 @@ namespace Kdv.CeusDL.Parser.TmpModel
 
         public TmpInterface() {
             this.Attributes = new List<TmpInterfaceAttribute>();
+            this.TypeAttributes = new List<TmpInterfaceTypeAttribute>();
         }
+
         public string Name {get;set;}
 
         ///
-        /// Gültige Werte: AttributTable, AttributView, FactTable
+        /// Gültige Werte: DefTable, DimTable, DimView, FactTable
         ///
         public string Type {get;set;}
+        public List<TmpInterfaceTypeAttribute> TypeAttributes {get;set;}
         public List<TmpInterfaceAttribute> Attributes {get;set;}
         
     }

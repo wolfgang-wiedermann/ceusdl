@@ -57,6 +57,10 @@ namespace Kdv.CeusDL.Parser {
             var ifa = new Interface();
             ifa.Name = input.Name;
             ifa.Type = InterfaceTypeResolver.Get(input.Type);
+            foreach(var tmpAttr in input.TypeAttributes) {
+                var attr = ToInterfaceTypeAttribute(tmpAttr);
+                ifa.TypeAttributes.Add(attr);
+            }
             foreach(var tmpAttr in input.Attributes) {
                 var attr = ToInterfaceAttribute(tmpAttr);
                 attr.ParentInterface = ifa;
@@ -108,6 +112,10 @@ namespace Kdv.CeusDL.Parser {
             // Unit
             attr.Unit = input.Unit;
             return attr;
+        }
+
+        private InterfaceTypeAttribute ToInterfaceTypeAttribute(TmpInterfaceTypeAttribute input) {
+            return InterfaceTypeAttribute.Convert(input);
         }
     }
 }
