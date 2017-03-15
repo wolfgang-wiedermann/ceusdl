@@ -43,3 +43,18 @@ interface Inventar : FactTable(mandant=true) {
     base Nutzungsdauer_F:int;
     base Anschaffungsdatum:varchar(len="20");
 }
+
+// --------------------------------------
+// Beispiel in CEUS Modification Language
+// -------------------------------------- 
+
+alter interface Raum remove ref Nachbargebaeude;
+alter interface Raum add ref Gebaeude.KNZ as NachbargebaeudeRechts;
+alter interface Raum modify base KNZ(len="55", primary_key="true");
+alter interface Raum remove base KNZ;
+alter interface Raum add base KNZ(len="55", primary_key="true");
+
+show alter interface Raum add ref Gebaeude.KNZ as NachbargebaeudeLinks;
+
+drop interface Raum;
+show drop interface Raum;
