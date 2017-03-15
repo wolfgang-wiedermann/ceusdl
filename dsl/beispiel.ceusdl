@@ -1,9 +1,15 @@
-// ------------------------------------
 // Beispiel in CEUS-Definition-Language
-// ------------------------------------
+// 0. Config
+config {
+    prefix="IVS";
+    il_database="FH_IVS_InterfaceLayer";
+    bl_database="FH_IVS_BaseLayer";
+    bt_database="FH_IVS_BaseLayer";
+    al_database="FH_IVS_Warehouse";
+}
 // 1. Interface Definitionen
 
-interface Raum {
+interface Raum : DimTable(mandant=true) {
     // Standard-Attributfelder
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
@@ -16,44 +22,24 @@ interface Raum {
     ref Gebaeude.KNZ as Nachbargebaeude;
 }
 
-interface Gebaeude {
+interface Gebaeude : DimTable(mandant=true) {
     // Standard-Attributfelder 
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
 }
 
-interface Raumnutzungsart {
+interface Raumnutzungsart : DimTable(mandant=true) {
     // Standard-Attributfelder
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
 }
 
-// --------------------------------------
-// Beispiel in CEUS Modification Language
-// -------------------------------------- 
-
-alter interface Raum remove ref Nachbargebaeude;
-alter interface Raum add ref Gebaeude.KNZ as NachbargebaeudeRechts;
-alter interface Raum modify base KNZ(len="55", primary_key="true");
-alter interface Raum remove base KNZ;
-alter interface Raum add base KNZ(len="55", primary_key="true");
-
-show alter interface Raum add ref Gebaeude.KNZ as NachbargebaeudeLinks;
-
-drop interface Raum;
-show drop interface Raum;
-
-create interface Raum {
-    // Standard-Attributfelder
+interface Inventar : FactTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
+    ref Raum.KNZ;
     base LANGBEZ:varchar(len="500");
-    // Fakt-Felder
-    base FLAECHE:decimal(len="12,2", unit="Quadratmeter");
-    // Referenzen zu anderen Attributen
-    ref Gebaeude.KNZ;
-    ref Raumnutzungsart.KNZ;
-    ref Gebaeude.KNZ as Nachbargebaeude;
+    base Nutzungsdauer_F:int;
+    base Anschaffungsdatum:varchar(len="20");
 }
