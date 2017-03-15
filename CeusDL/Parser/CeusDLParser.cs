@@ -6,7 +6,7 @@ using static Kdv.CeusDL.Parser.CeusDLParserState;
 
 namespace Kdv.CeusDL.Parser
 {
-    public class CeusDLParser {
+    public partial class CeusDLParser {
         // Ein- und Ausschalten der Debug-Ausgaben ...
         private static bool isDebug = false;
         TmpParserResult result = new TmpParserResult();
@@ -95,6 +95,18 @@ namespace Kdv.CeusDL.Parser
                     case IN_INTERFACE_ATTRIBUTE_ALIAS:
                         onInInterfaceAttributeAlias(i, code);
                         break;
+                    case IN_CONFIG:
+                        onInConfig(i, code);
+                        break;
+                    case IN_CONFIG_PARAM_NAME:
+                        onInConfigParamName(i, code);
+                        break;
+                    case IN_CONFIG_PARAM_VALUE:
+                        onInConfigParamValue(i, code);
+                        break;
+                    case IN_CONFIG_PARAM_STRING:
+                        onInConfigParamString(i, code);
+                        break;
                     default:
                         Console.WriteLine($"Reached unhandled State {state}");
                         return null;
@@ -153,6 +165,9 @@ namespace Kdv.CeusDL.Parser
                         break;
                     case "attribute":
                         this.state = IN_ATTRIBUTE_NAME;
+                        break;
+                    case "config":
+                        this.state = IN_CONFIG;
                         break;
                     case "metric":
                         this.state = IN_METRIC_NAME;
