@@ -10,15 +10,15 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Dem Interface Namen ein BL_ voranstellen
         ///
-        protected string GetTableName(Interface ifa) {
-            return $"BL_{ifa.Name}";
+        protected string GetTableName(Interface ifa) {        
+            return $"BL{GetTypeSuffix(ifa)}_{ifa.Name}";
         }
 
         ///
         /// Dem Interface Namen ein BL_ voranstellen und ein _VW anhängen
         ///
         protected string GetViewName(Interface ifa) {
-            return $"BL_{ifa.Name}_VW";
+            return $"BL{GetTypeSuffix(ifa)}_{ifa.Name}_VW";
         }
 
         ///
@@ -102,6 +102,20 @@ namespace Kdv.CeusDL.Generator.BL {
             } else {
                 // TODO: Exception werfen
                 return "ERROR";
+            }
+        }
+
+        private string GetTypeSuffix(Interface ifa) {
+            switch(ifa.Type) {
+                case InterfaceType.DEF_TABLE:
+                    return "_DEF";                    
+                case InterfaceType.DIM_TABLE:
+                case InterfaceType.DIM_VIEW:
+                    return "_D";                    
+                case InterfaceType.FACT_TABLE:
+                    return "_F";                    
+                default:
+                    throw new InvalidOperationException("Ungültiger Zustand");
             }
         }
     }

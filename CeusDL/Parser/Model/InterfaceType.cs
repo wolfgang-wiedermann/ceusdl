@@ -13,7 +13,12 @@ namespace Kdv.CeusDL.Parser.Model
                 return InterfaceType.DIM_TABLE;
             }
 
+            if(name == null) {
+                name = "";
+            }
+
             switch(name) {
+                case "": return InterfaceType.DIM_TABLE;
                 case "DefTable": return InterfaceType.DEF_TABLE;
                 case "DimTable": return InterfaceType.DIM_TABLE;            
                 case "DimView": return InterfaceType.DIM_VIEW;                

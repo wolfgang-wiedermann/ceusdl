@@ -24,9 +24,11 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Generierung des gesamten Codes für eine Tabelle/Interface
         ///
+        /// TODO: Zerlegen in Dim- und Faktentabllen, Def-Tabellen insgesamt ausschließen...
+        ///
         public string GenerateCreateViewCode(Interface ifa) {
             var il = new InterfaceLayerGenerator();
-            string code = $"create view {GetViewName(ifa)} as \n";
+            string code = $"go\ncreate view {GetViewName(ifa)} as \n";
             code += $"select bl.{ifa.Name}_ID";
             foreach(var attr in ifa.Attributes) {
                 if(attr is InterfaceBasicAttribute) {
@@ -44,7 +46,18 @@ namespace Kdv.CeusDL.Generator.BL {
             }
             code += $"\nfrom IL_{ifa.Name} as il\n";
             code += $"    left outer join {GetTableName(ifa)} as bl\n";
-            code += $"    on il.{GetILPKField(ifa)} = bl.{GetBLPKField(ifa)};\n\n";
+            code += $"    on il.{GetILPKField(ifa)} = bl.{GetBLPKField(ifa)}";
+
+            if(ifa.IsMandantInterface()) {                
+                code += "\n        and il.Mandant_KNZ = bl.Mandant_KNZ";
+            }
+
+            if(ifa.IsHistorizedInterface()) {
+                // TODO: Join-Bedingung mit gültig von und gültig bis...
+                code += "\n        -- TODO: Join-Bedingung mit gültig von und gültig bis...";
+            }
+
+            code += ";\n\n";
             return code;
         }
     }

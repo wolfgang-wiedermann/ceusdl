@@ -5,7 +5,8 @@ namespace Kdv.CeusDL.Generator.IL {
         public string GenerateCode(ParserResult model) {
             string code = "-- Interface Layer\n\n";
             foreach(var obj in model.Interfaces) {
-                if(InterfaceTypeResolver.IsTable(obj.Type)) {
+                // Nur Tabellen, und keine Def-Tabellen die beginnen erst in BL
+                if(InterfaceTypeResolver.IsTable(obj.Type) && obj.Type != InterfaceType.DEF_TABLE) {
                     code += GenerateILTable(obj);
                 }
             }
@@ -14,15 +15,19 @@ namespace Kdv.CeusDL.Generator.IL {
 
         public string GenerateILTable(Interface ifa) {
             int i = 0;
-            string code = $"create table IL_{ifa.Name} (\n";
+            string code = $"create table IL_{ifa.Name} (\n";            
             foreach(var field in ifa.Attributes) {
                 code += GenerateILTableField(field);
                 if(i+1 < ifa.Attributes.Count) {
-                    code += ", \n";
-                } else {
+                    code += ",\n";
+                } else if(!ifa.IsMandantInterface()) {
                     code += "\n";
                 }
                 i++;
+            }
+
+            if(ifa.IsMandantInterface()) {
+                code += ",\n    Mandant_KNZ varchar(10) not null\n";
             }
             code += ");\n\n";
             return code;
