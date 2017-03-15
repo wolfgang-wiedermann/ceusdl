@@ -1,7 +1,7 @@
 using Kdv.CeusDL.Parser.Model;
 using System.Linq;
 
-namespace Kdv.CeusDL.Generator {
+namespace Kdv.CeusDL.Generator.BL {
     public class BaseLayerGenerator : IGenerator {
         
         public string GenerateCode(ParserResult model) {

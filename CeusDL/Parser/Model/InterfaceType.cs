@@ -24,5 +24,20 @@ namespace Kdv.CeusDL.Parser.Model
                     throw new InvalidDataException("InterfaceType ungültig");
             }
         }
+
+        ///
+        /// Ermittelt, ob ein interface eine Tabelle oder eine View sein soll...
+        ///
+        public static bool IsTable(InterfaceType type) {
+            switch(type) {
+                case InterfaceType.DIM_TABLE:
+                case InterfaceType.DIM_TABLE_HISTORY:
+                case InterfaceType.FACT_TABLE:
+                case InterfaceType.FACT_TABLE_HISTORY:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 }

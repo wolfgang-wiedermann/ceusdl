@@ -1,8 +1,9 @@
 using Kdv.CeusDL.Parser.Model;
+using Kdv.CeusDL.Generator.IL;
 using System.Linq;
 using System;
 
-namespace Kdv.CeusDL.Generator {
+namespace Kdv.CeusDL.Generator.BL {
     public class BaseLayerViewGenerator : BaseLayerAbstractGenerator
     {
         public override string GenerateCode(ParserResult model)

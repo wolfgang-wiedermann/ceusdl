@@ -1,7 +1,8 @@
 ﻿using System;
 using System.IO;
 using Kdv.CeusDL.Parser;
-using Kdv.CeusDL.Generator;
+using Kdv.CeusDL.Generator.IL;
+using Kdv.CeusDL.Generator.BL;
 
 namespace ConsoleApplication
 {

@@ -1,12 +1,11 @@
 using Kdv.CeusDL.Parser.Model;
 
-namespace Kdv.CeusDL.Generator {
+namespace Kdv.CeusDL.Generator.IL {
     public class InterfaceLayerGenerator : IGenerator {
         public string GenerateCode(ParserResult model) {
             string code = "-- Interface Layer\n\n";
             foreach(var obj in model.Interfaces) {
-                if(obj.Type == InterfaceType.DIM_TABLE 
-                    || obj.Type == InterfaceType.FACT_TABLE) {
+                if(InterfaceTypeResolver.IsTable(obj.Type)) {
                     code += GenerateILTable(obj);
                 }
             }
