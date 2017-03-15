@@ -6,9 +6,9 @@ namespace Kdv.CeusDL.Generator.BL {
         
         public string GenerateCode(ParserResult model) {
             var tab = new BaseLayerTableGenerator();
-            var vie = new BaseLayerViewGenerator();
+            //var vie = new BaseLayerViewGenerator();
 
-            return tab.GenerateCode(model) + vie.GenerateCode(model);
+            return tab.GenerateCode(model); // + vie.GenerateCode(model);
         }
     }
 }

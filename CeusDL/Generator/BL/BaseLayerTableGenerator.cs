@@ -16,7 +16,7 @@ namespace Kdv.CeusDL.Generator.BL {
                     code += GenerateCreateDimTableCode(obj).Replace("\n", "\n* ");
                     code += "*/\n";
                 } else if(obj.Type == InterfaceType.FACT_TABLE) {                    
-                    code += GenerateCreateFactTableCode(obj);
+                    code += GenerateCreateFactTableCode(obj, model);
                 } else if(obj.Type == InterfaceType.DEF_TABLE) {                    
                     code += GenerateCreateDefTableCode(obj);
                 }
@@ -29,12 +29,13 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         public string GenerateCreateDimTableCode(Interface ifa) {
             string code = $"create table {GetTableName(ifa)} (\n";
-            code += $"    {ifa.Name}_ID int primary key identity not null";
-            code += GetMandantSpalte(ifa);
+            code += $"    {ifa.Name}_ID int primary key identity not null";            
 
             foreach(var attribute in ifa.Attributes) {
                 code += $",\n    {GetAttributeName(attribute)} {GetAttributeType(attribute)}";
             }
+
+            code += GetMandantSpalte(ifa);
 
             if(ifa.IsHistorizedInterface()) {
                 code += ",\n    T_Gueltig_Von int not null";
@@ -56,13 +57,20 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Generierung des gesamten Codes für eine Tabelle/Interface
         ///
-        public string GenerateCreateFactTableCode(Interface ifa) {
+        public string GenerateCreateFactTableCode(Interface ifa, ParserResult model) {
             string code = $"create table {GetTableName(ifa)} (\n";
-            code += $"    {ifa.Name}_ID int primary key identity not null";
-            code += GetMandantSpalte(ifa);
+            code += $"    {ifa.Name}_ID int primary key identity not null";            
 
             foreach(var attribute in ifa.Attributes) {
                 code += $",\n    {GetAttributeName(attribute)} {GetAttributeType(attribute)}";
+            }
+
+            code += GetMandantSpalte(ifa);
+
+            if(ifa.IsHistorizedInterface()) {
+                var attr = ifa.TypeAttributes.Where(a => a.Name.Equals(InterfaceTypeAttributeEnum.HISTORY)).First();
+                var attribute = model.GetBasicAttributeByName(attr.Value); // TODO: Evtl. wie zusätzliches ref-Attribut behandeln ???
+                code += $",\n    -- Historisiert pro Ausprägung dieses Attributs\n    HIST_{GetAttributeName(attribute)} {GetAttributeType(attribute)}";
             }
 
             code += ",\n    T_Modifikation varchar(10) not null";
