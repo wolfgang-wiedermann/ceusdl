@@ -30,7 +30,12 @@ namespace Kdv.CeusDL.Parser {
 
         internal ParserResult ToParserResult() {
             var result = new ParserResult();
-            // Bassis übersetzen
+            // Konfiguration (falls Vorhanden) einlesen
+            result.Config = new Config();
+            foreach(var tmpConfItem in Input.Config.Items) {
+                result.Config.Items.Add(ConfigItem.Convert(tmpConfItem));
+            }
+            // Basis übersetzen
             foreach(var tmpIfa in Input.Interfaces) {
                 var ifa = ToInterface(tmpIfa);
                 result.Interfaces.Add(ifa);

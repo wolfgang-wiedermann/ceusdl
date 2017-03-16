@@ -13,6 +13,10 @@ namespace ConsoleApplication
             var parser = new CeusDLParser();
             var result = parser.ParseFile(Path.Combine(".", "dsl", "bewerber.ceusdl"));
 
+            if(result == null) {
+                throw new Exception("Parsing-Vorgang mit Fehler abgebrochen ....");
+            }
+
             //Console.WriteLine(result?.ToString());
             //Console.WriteLine();
 

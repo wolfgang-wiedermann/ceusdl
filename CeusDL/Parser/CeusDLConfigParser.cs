@@ -19,7 +19,8 @@ namespace Kdv.CeusDL.Parser
             if(IsWhitespaceChar(c)) {
                 // Ignorieren: TODO: Blanks in Namen verbieten!
             } else if(c == '{') {
-                // Wechsel zu Interface-Body                                
+                // Wechsel zu Interface-Body      
+                result.Config = currentConfig;                          
                 buf = "";
                 this.state = IN_CONFIG_PARAM_NAME;
             } else {

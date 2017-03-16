@@ -7,6 +7,7 @@ namespace Kdv.CeusDL.Parser.Model
 {
     public class ParserResult {
         public List<Interface> Interfaces = new List<Interface>();
+        public Config Config = new Config();
 
         public Interface GetInterfaceByName(string name) {
             var result = this.Interfaces.Where(i => i.Name.Equals(name));
