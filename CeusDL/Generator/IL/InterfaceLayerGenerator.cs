@@ -1,9 +1,22 @@
 using Kdv.CeusDL.Parser.Model;
 
 namespace Kdv.CeusDL.Generator.IL {
+
+    ///
+    /// Achtung: Nicht Threadsave !!! (wegen Prefix-Attribut)
+    ///
     public class InterfaceLayerGenerator : IGenerator {
+
+        private string prefix = "";
+
         public string GenerateCode(ParserResult model) {
-            string code = "-- Interface Layer\n\n";
+            // Prefix vorbereiten
+            if(model.Config.HasValueFor(ConfigItemEnum.PREFIX)) {
+                prefix = $"{model.Config.GetValue(ConfigItemEnum.PREFIX)}_";
+            }
+
+            string code = "--\n-- Interface Layer\n--\n\n";
+            code += GetHeader(model);
             foreach(var obj in model.Interfaces) {
                 // Nur Tabellen, und keine Def-Tabellen die beginnen erst in BL
                 if(InterfaceTypeResolver.IsTable(obj.Type) && obj.Type != InterfaceType.DEF_TABLE) {
@@ -13,9 +26,17 @@ namespace Kdv.CeusDL.Generator.IL {
             return code;
         }
 
+        public string GetHeader(ParserResult model) {
+            string code = "";
+            if(model.Config.HasValueFor(ConfigItemEnum.IL_DATABASE)) {
+                code += $"use {model.Config.GetValue(ConfigItemEnum.IL_DATABASE)};\n\n";
+            }
+            return code;
+        }
+
         public string GenerateILTable(Interface ifa) {
             int i = 0;
-            string code = $"create table IL_{ifa.Name} (\n";            
+            string code = $"create table {prefix}IL_{ifa.Name} (\n";            
             foreach(var field in ifa.Attributes) {
                 code += GenerateILTableField(field);
                 if(i+1 < ifa.Attributes.Count) {

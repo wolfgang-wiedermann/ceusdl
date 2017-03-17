@@ -8,18 +8,27 @@ namespace Kdv.CeusDL.Generator.BL {
         public override string GenerateCode(ParserResult model)
         {
             string code = "--\n-- BaseLayer\n--\n\n";
+            code += GetHeader(model);
             foreach(var obj in model.Interfaces) {
                 if(obj.Type == InterfaceType.DIM_TABLE) {                        
-                    code += GenerateCreateDimTableCode(obj);
+                    code += GenerateCreateDimTableCode(obj, model.Config);
                 } else if(obj.Type == InterfaceType.DIM_VIEW) {
                     code += "/*\n* Create a View that conforms to the following Table\n*\n* ";
-                    code += GenerateCreateDimTableCode(obj).Replace("\n", "\n* ");
+                    code += GenerateCreateDimTableCode(obj, model.Config).Replace("\n", "\n* ");
                     code += "*/\n";
                 } else if(obj.Type == InterfaceType.FACT_TABLE) {                    
                     code += GenerateCreateFactTableCode(obj, model);
                 } else if(obj.Type == InterfaceType.DEF_TABLE) {                    
-                    code += GenerateCreateDefTableCode(obj);
+                    code += GenerateCreateDefTableCode(obj, model.Config);
                 }
+            }
+            return code;
+        }
+
+        public string GetHeader(ParserResult model) {
+            string code = "";
+            if(model.Config.HasValueFor(ConfigItemEnum.BL_DATABASE)) {
+                code += $"use {model.Config.GetValue(ConfigItemEnum.BL_DATABASE)};\n\n";
             }
             return code;
         }
@@ -27,8 +36,8 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Generierung des gesamten Codes für eine Dimensionstabelle/Interface
         ///
-        public string GenerateCreateDimTableCode(Interface ifa) {
-            string code = $"create table {GetTableName(ifa)} (\n";
+        public string GenerateCreateDimTableCode(Interface ifa, Config conf) {
+            string code = $"create table {GetTableName(ifa, conf)} (\n";
             code += $"    {ifa.Name}_ID int primary key identity not null";            
 
             foreach(var attribute in ifa.Attributes) {
@@ -58,7 +67,7 @@ namespace Kdv.CeusDL.Generator.BL {
         /// Generierung des gesamten Codes für eine Tabelle/Interface
         ///
         public string GenerateCreateFactTableCode(Interface ifa, ParserResult model) {
-            string code = $"create table {GetTableName(ifa)} (\n";
+            string code = $"create table {GetTableName(ifa, model.Config)} (\n";
             code += $"    {ifa.Name}_ID int primary key identity not null";            
 
             foreach(var attribute in ifa.Attributes) {
@@ -88,8 +97,8 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Generierung des gesamten Codes für eine Definitionstabelle/Interface
         ///
-        public string GenerateCreateDefTableCode(Interface ifa) {
-            string code = $"create table {GetTableName(ifa)} (\n";
+        public string GenerateCreateDefTableCode(Interface ifa, Config conf) {
+            string code = $"create table {GetTableName(ifa, conf)} (\n";
             code += $"    {ifa.Name}_ID int primary key identity not null"; 
             code += GetMandantSpalte(ifa);
 

@@ -10,15 +10,48 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Dem Interface Namen ein BL_ voranstellen
         ///
-        protected string GetTableName(Interface ifa) {        
-            return $"BL{GetTypeSuffix(ifa)}_{ifa.Name}";
+        protected string GetTableName(Interface ifa, Config conf) {        
+            return $"{GetPrefix(conf)}BL{GetTypeSuffix(ifa)}_{ifa.Name}";
         }
 
         ///
         /// Dem Interface Namen ein BL_ voranstellen und ein _VW anhängen
         ///
-        protected string GetViewName(Interface ifa) {
-            return $"BL{GetTypeSuffix(ifa)}_{ifa.Name}_VW";
+        protected string GetViewName(Interface ifa, Config conf) {
+            return $"{GetPrefix(conf)}BL{GetTypeSuffix(ifa)}_{ifa.Name}_VW";
+        }
+
+        ///
+        /// Falls in config-Sektion enthalten, Prefix liefern, ansonsten leerstring
+        ///
+        protected string GetPrefix(Config conf) {
+            if(conf.HasValueFor(ConfigItemEnum.PREFIX)) {
+                return $"{conf.GetValue(ConfigItemEnum.PREFIX)}_";                
+            } else {
+                return "";
+            }
+        }
+
+        ///
+        /// Ermittelt den InterfaceLayer-Datenbankprefix (DB + Schema)
+        ///
+        protected string GetILDatabaseAndSchema(Config conf) {
+            if(conf.HasValueFor(ConfigItemEnum.IL_DATABASE)) {
+                return $"{conf.GetValue(ConfigItemEnum.IL_DATABASE)}.dbo.";                
+            } else {
+                return "";
+            }
+        }
+
+        ///
+        /// Ermittelt den InterfaceLayer-Datenbankprefix (DB + Schema)
+        ///
+        protected string GetBLDatabaseAndSchema(Config conf) {
+            if(conf.HasValueFor(ConfigItemEnum.BL_DATABASE)) {
+                return $"{conf.GetValue(ConfigItemEnum.BL_DATABASE)}.dbo.";                
+            } else {
+                return "";
+            }
         }
 
         ///

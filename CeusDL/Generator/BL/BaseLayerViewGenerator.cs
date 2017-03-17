@@ -11,10 +11,10 @@ namespace Kdv.CeusDL.Generator.BL {
             string code = "--\n-- BaseLayer Views\n--\n\n";
             foreach(var obj in model.Interfaces) {
                 if(obj.Type == InterfaceType.DIM_TABLE) {
-                    code += GenerateCreateViewCode(obj);
+                    code += GenerateCreateViewCode(obj, model.Config);
                 } else if(obj.Type == InterfaceType.FACT_TABLE) {
                     // TODO: Prüfen, ob der code auf bei Faktentabellen passt !!!
-                    code += GenerateCreateViewCode(obj);
+                    code += GenerateCreateViewCode(obj, model.Config);
                 } 
                 // TODO: hier weiter für die anderen Inteface-Typen
             }
@@ -26,10 +26,11 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// TODO: Zerlegen in Dim- und Faktentabllen, Def-Tabellen insgesamt ausschließen...
         ///
-        public string GenerateCreateViewCode(Interface ifa) {
+        public string GenerateCreateViewCode(Interface ifa, Config conf) {
             var il = new InterfaceLayerGenerator();
-            string code = $"go\ncreate view {GetViewName(ifa)} as \n";
+            string code = $"go\ncreate view {GetViewName(ifa, conf)} as \n";
             code += $"select bl.{ifa.Name}_ID";
+
             foreach(var attr in ifa.Attributes) {
                 if(attr is InterfaceBasicAttribute) {
                     var basic = (InterfaceBasicAttribute)attr;
@@ -44,8 +45,9 @@ namespace Kdv.CeusDL.Generator.BL {
                 }
                 code += $" as {GetAttributeName(attr)}";
             }
-            code += $"\nfrom IL_{ifa.Name} as il\n";
-            code += $"    left outer join {GetTableName(ifa)} as bl\n";
+
+            code += $"\nfrom {GetILDatabaseAndSchema(conf)}{GetPrefix(conf)}IL_{ifa.Name} as il\n";
+            code += $"    left outer join {GetBLDatabaseAndSchema(conf)}{GetTableName(ifa, conf)} as bl\n";
             code += $"    on il.{GetILPKField(ifa)} = bl.{GetBLPKField(ifa)}";
 
             if(ifa.IsMandantInterface()) {                
