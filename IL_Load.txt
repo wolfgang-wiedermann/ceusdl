@@ -1,0 +1,18 @@
+use FH_AP_InterfaceLayer;
+
+delete from StudiengangHisInOne where Mandant_KNZ = @mandant;
+truncate table Antragsfachstatus;
+truncate table Bewerberstatus;
+truncate table Zulassung;
+delete from Zulassungsart where Mandant_KNZ = @mandant;
+delete from Zulassungsquote where Mandant_KNZ = @mandant;
+truncate table Kontinent;
+truncate table Land;
+truncate table Bundesland;
+truncate table Regierungsbezirk;
+truncate table Kreis;
+truncate table HZBArt;
+delete from Bewerber where Mandant_KNZ = @mandant;
+delete from Antrag where Mandant_KNZ = @mandant;
+delete from BewerberVerlauf where Mandant_KNZ = @mandant;
+delete from AntragVerlauf where Mandant_KNZ = @mandant;

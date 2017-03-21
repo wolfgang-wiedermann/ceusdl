@@ -23,6 +23,9 @@ namespace ConsoleApplication
             var ilGenerator = new InterfaceLayerGenerator();
             Console.WriteLine(ilGenerator.GenerateCode(result));
 
+            var ilLoadGenerator = new InterfaceLayerLoadGenerator();        
+            File.WriteAllText("IL_Load.txt", ilLoadGenerator.GenerateCode(result));
+
             //var cdlGenerator = new CeusDLGenerator();
             //Console.WriteLine(cdlGenerator.GenerateCode(result));
 

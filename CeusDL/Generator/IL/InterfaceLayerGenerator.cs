@@ -5,11 +5,9 @@ namespace Kdv.CeusDL.Generator.IL {
     ///
     /// Achtung: Nicht Threadsave !!! (wegen Prefix-Attribut)
     ///
-    public class InterfaceLayerGenerator : IGenerator {
+    public class InterfaceLayerGenerator : InterfaceLayerAbstractGenerator {
 
-        private string prefix = "";
-
-        public string GenerateCode(ParserResult model) {
+        public override string GenerateCode(ParserResult model) {
             // Prefix vorbereiten
             if(model.Config.HasValueFor(ConfigItemEnum.PREFIX)) {
                 prefix = $"{model.Config.GetValue(ConfigItemEnum.PREFIX)}_";
@@ -22,14 +20,6 @@ namespace Kdv.CeusDL.Generator.IL {
                 if(InterfaceTypeResolver.IsTable(obj.Type) && obj.Type != InterfaceType.DEF_TABLE) {
                     code += GenerateILTable(obj);
                 }
-            }
-            return code;
-        }
-
-        public string GetHeader(ParserResult model) {
-            string code = "";
-            if(model.Config.HasValueFor(ConfigItemEnum.IL_DATABASE)) {
-                code += $"use {model.Config.GetValue(ConfigItemEnum.IL_DATABASE)};\n\n";
             }
             return code;
         }
@@ -68,18 +58,6 @@ namespace Kdv.CeusDL.Generator.IL {
                     code += $"{refer.Alias}_{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
                 }
                 code += GetTypeFromBasic(refer.ReferencedAttribute);
-            }
-            return code;
-        }
-
-        public string GetTypeFromBasic(InterfaceBasicAttribute basic) {
-            string code = "";
-            if(basic.DataType == InterfaceAttributeDataType.VARCHAR) {
-                code += $"varchar({basic.Length})";
-            } else if(basic.DataType == InterfaceAttributeDataType.DECIMAL) {
-                code += $"decimal({basic.Length},{basic.Decimals})";
-            } else if(basic.DataType == InterfaceAttributeDataType.INT) {
-                code += $"int";
             }
             return code;
         }
