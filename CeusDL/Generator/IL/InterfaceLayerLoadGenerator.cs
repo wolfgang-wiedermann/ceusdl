@@ -28,7 +28,7 @@ namespace Kdv.CeusDL.Generator.IL {
             string code = GetHeader(model);
             foreach(var obj in model.Interfaces) {
                 // Nur Tabellen, und keine Def-Tabellen die beginnen erst in BL
-                if(InterfaceTypeResolver.IsTable(obj.Type) && obj.Type != InterfaceType.DEF_TABLE) {
+                if(obj.Type != InterfaceType.DIM_VIEW && obj.Type != InterfaceType.DEF_TABLE) {
                     if(obj.IsMandantInterface()) {
                         code += $"delete from {obj.Name} where Mandant_KNZ = @mandant;\n";
                     } else {
@@ -48,7 +48,7 @@ namespace Kdv.CeusDL.Generator.IL {
             }
 
             foreach(var ifa in model.Interfaces) {
-                if(InterfaceTypeResolver.IsTable(ifa.Type) && ifa.Type != InterfaceType.DEF_TABLE) {
+                if(ifa.Type != InterfaceType.DIM_VIEW && ifa.Type != InterfaceType.DEF_TABLE) {
                     File.WriteAllText(Path.Combine(FOLDER, $"{ifa.Name}Loader.cs"), CreateLoadCsvClass(ifa, model));
                 }
             }
@@ -56,7 +56,7 @@ namespace Kdv.CeusDL.Generator.IL {
 
         private string CreateLoadCsvClass(Interface ifa, ParserResult model)
         {
-            string code ="using System.Collections.Generic;\nusing System.IO;\n\nnamespace Kdv.Loader";
+            string code ="using System;\nusing System.Collections.Generic;\nusing System.IO;\nusing System.Data.Common;\n\nnamespace Kdv.Loader";
             if(model.Config.HasValueFor(ConfigItemEnum.PREFIX)) {
                 code += $".{model.Config.GetValue(ConfigItemEnum.PREFIX)}";
             }
@@ -64,6 +64,11 @@ namespace Kdv.CeusDL.Generator.IL {
             // Parser-State-Enum generieren
             code += $"    public enum {ifa.Name}ParserState "+"{\n";
             code += "        ";
+
+            if(ifa.IsMandantInterface()) {
+                code += "IN_MANDANT_KNZ, ";
+            }
+
             int i = 0;
             foreach(var attr in ifa.Attributes) {
                 i++;
@@ -84,9 +89,30 @@ namespace Kdv.CeusDL.Generator.IL {
             code += $"    public class {ifa.Name}Loader "+"{\n";
             
             // Attribute
+            if(ifa.IsMandantInterface()) {
+                code += "        public string Mandant_KNZ { get; set; }\n";
+            }
             foreach(var attr in ifa.Attributes) {
                 code += CreateCSAttribute(attr, ifa);
             }
+
+            // Ausführen der Übertragung in die Datenbank
+            code += "        public static void Execute(string filename, DbConnection con) {\n";
+            code += "            if(con == null) {\n";
+            code += "                // Für Debug-Zwecke Ausgabe ...\n";
+            code += "                foreach(var line in Load(filename)) {\n";
+            code += "                    Console.WriteLine(GetInsertSQL(line));\n";
+            code += "                }\n";
+            code += "            } else {\n";
+            code += "                // Tatsächliche Verarbeitung ...\n";
+            code += "                using(var cmd = con.CreateCommand()) {\n";
+            code += "                    foreach(var line in Load(filename)) {\n";
+            code += "                        cmd.CommandText = GetInsertSQL(line);\n";
+            code += "                        cmd.ExecuteNonQuery();\n";
+            code += "                    }\n";
+            code += "                }\n";
+            code += "            }\n";
+            code += "        }\n";            
 
             // Laden der Datei
             code += $"\n        public static IEnumerable<{ifa.Name}Loader> Load(string filename)"+" {\n";
@@ -99,6 +125,28 @@ namespace Kdv.CeusDL.Generator.IL {
             code += "                    yield return ParseLine(line);\n";
             code += "                }\n";
             code += "            }\n";
+            code += "        }\n\n";
+
+            // Insert-SQL-Statement generieren
+            code += $"        internal static string GetInsertSQL({ifa.Name}Loader line) {{\n";
+            code += $"            string sql = \"insert into {GetILDatabase(model)}.dbo.IL_{ifa.Name} values (\";\n";
+
+            i = 0;
+            foreach(var attr in ifa.Attributes) {
+                i++;
+                code += $"            sql += \"'\"+line.{GetCSAttributeName(attr, ifa)}+\"'";
+                if(i < ifa.Attributes.Count && !ifa.IsMandantInterface()) {
+                    code += ", \";\n";;
+                } else {
+                    code += "\";\n";;
+                }                
+            }
+            if(ifa.IsMandantInterface()) {
+                code += $"            sql += \"'\"+line.Mandant_KNZ+\"'\";";
+            }
+
+            code += $"            sql += \");\";\n";
+            code += $"            return sql;\n";
             code += "        }\n\n";
 
             // Parser-Funktion
@@ -130,7 +178,11 @@ namespace Kdv.CeusDL.Generator.IL {
                 code += $"                            substate = {ifa.Name}ParserSubstate.INITIAL;\n";
                 code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INITIAL && c == ';') {\n";
                 if(nextAttr == null) {
-                    code += $"                            state = {ifa.Name}ParserState.FINAL;\n";
+                    if(ifa.IsMandantInterface()) {
+                        code += $"                            state = {ifa.Name}ParserState.IN_MANDANT_KNZ;\n";
+                    } else {
+                        code += $"                            state = {ifa.Name}ParserState.FINAL;\n";
+                    }
                 } else {
                     code += $"                            state = {ifa.Name}ParserState.IN_{GetCSAttributeName(nextAttr, ifa).ToUpper()};\n";
                 }
@@ -138,6 +190,25 @@ namespace Kdv.CeusDL.Generator.IL {
                 code += "                            buf += c;\n";
                 code += "                        }\n";
                 code += "                        break;\n";
+            }
+
+            if(ifa.IsMandantInterface()) {
+                code += $"                    case {ifa.Name}ParserState.IN_MANDANT_KNZ:\n";
+                code += $"                        if(substate == {ifa.Name}ParserSubstate.INITIAL && c == '\"') "+"{\n";
+                code += $"                            substate = {ifa.Name}ParserSubstate.INSTRING;\n";
+                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INITIAL && c == '\"') {\n";
+                code += "                            throw new InvalidDataException($\"Ungültiges Zeichen an Position {i}\");\n";
+                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INSTRING && c == '\"') {\n";
+                code += $"                            content.Mandant_KNZ = buf;\n";
+                code += "                            buf = \"\";\n";
+                code += $"                            substate = {ifa.Name}ParserSubstate.INITIAL;\n";
+                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INITIAL && c == ';') {\n";
+                code += $"                            state = {ifa.Name}ParserState.FINAL;\n";            
+                code += "                        } else {\n";
+                code += "                            buf += c;\n";
+                code += "                        }\n";
+                code += "                        break;\n";
+
             }
 
             code += "                    default:\n";

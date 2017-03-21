@@ -21,6 +21,14 @@ namespace Kdv.CeusDL.Generator.IL {
             return code;
         }
 
+        public string GetILDatabase(ParserResult model) {
+            if(model.Config.HasValueFor(ConfigItemEnum.IL_DATABASE)) {
+                return model.Config.GetValue(ConfigItemEnum.IL_DATABASE);
+            } else {
+                return "FH_InterfaceLayer";
+            }
+        }
+
         public string GetTypeFromBasic(InterfaceBasicAttribute basic) {
             string code = "";
             if(basic.DataType == InterfaceAttributeDataType.VARCHAR) {
