@@ -104,11 +104,15 @@ namespace Kdv.CeusDL.Generator.IL {
             code += "                    Console.WriteLine(GetInsertSQL(line));\n";
             code += "                }\n";
             code += "            } else {\n";
-            code += "                // Tatsächliche Verarbeitung ...\n";
+            code += "                int i = 0;\n";
+            code += "                // Tatsächliche Verarbeitung: 1. Zeile wird als Kopfzeile ausgelassen.\n";
             code += "                using(var cmd = con.CreateCommand()) {\n";
             code += "                    foreach(var line in Load(filename)) {\n";
             code += "                        cmd.CommandText = GetInsertSQL(line);\n";
-            code += "                        cmd.ExecuteNonQuery();\n";
+            code += "                        if(i > 0) {\n";
+            code += "                            cmd.ExecuteNonQuery();\n";
+            code += "                        }\n";
+            code += "                        i++;\n";
             code += "                    }\n";
             code += "                }\n";
             code += "            }\n";
