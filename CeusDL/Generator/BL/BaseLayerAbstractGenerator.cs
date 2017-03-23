@@ -138,6 +138,25 @@ namespace Kdv.CeusDL.Generator.BL {
             }
         }
 
+        ///
+        /// Ermittelt einen InterfaceLayer-Konformen Attribut-Namen
+        ///
+        protected string GetILAttributeName(InterfaceAttribute attr) {
+            string code = "";
+            if(attr is InterfaceBasicAttribute) {
+                var basic = (InterfaceBasicAttribute)attr;
+                code += $"{attr.ParentInterface.Name}_{basic.Name}";
+            } else {
+                var refer = (InterfaceRefAttribute)attr;
+                if(string.IsNullOrEmpty(refer.Alias)) {
+                    code += $"{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
+                } else {
+                    code += $"{refer.Alias}_{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
+                }
+            }
+            return code;
+        }
+
         private string GetTypeSuffix(Interface ifa) {
             switch(ifa.Type) {
                 case InterfaceType.DEF_TABLE:

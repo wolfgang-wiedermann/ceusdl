@@ -32,19 +32,10 @@ namespace Kdv.CeusDL.Generator.BL {
             code += $"select bl.{ifa.Name}_ID";
 
             foreach(var attr in ifa.Attributes) {
-                if(attr is InterfaceBasicAttribute) {
-                    var basic = (InterfaceBasicAttribute)attr;
-                    code += $",\n    il.{attr.ParentInterface.Name}_{basic.Name}";
-                } else {
-                    var refer = (InterfaceRefAttribute)attr;
-                    if(string.IsNullOrEmpty(refer.Alias)) {
-                        code += $",\n    il.{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
-                    } else {
-                        code += $",\n    il.{refer.Alias}_{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
-                    }
-                }
-                code += $" as {GetAttributeName(attr)}";
+                code += $",\n    il.{GetILAttributeName(attr)} as {GetAttributeName(attr)}";
             }
+
+            code += GetTModifikation(ifa);
 
             code += $"\nfrom {GetILDatabaseAndSchema(conf)}{GetPrefix(conf)}IL_{ifa.Name} as il\n";
             code += $"    left outer join {GetBLDatabaseAndSchema(conf)}{GetTableName(ifa, conf)} as bl\n";
@@ -62,6 +53,49 @@ namespace Kdv.CeusDL.Generator.BL {
             code += ";\n\n";
             return code;
         }
-    }
 
+        ///
+        /// case 
+        ///     when bl.Bewerberstatus_ID is null then 'I'
+        ///     when bl.Bewerberstatus_KURZBEZ <> il.Bewerberstatus_KURZBEZ 
+        ///       or bl.Bewerberstatus_LANGBEZ <> il.Bewerberstatus_LANGBEZ then 'U'
+        ///     else 'X' 
+        /// end as T_Modifikation	
+        ///
+        private string GetTModifikation(Interface ifa) {
+            // wird bei Faktentabellen nicht verwendet!
+            if(ifa.Type == InterfaceType.FACT_TABLE) {
+                return "";
+            }
+
+            string code = ",\n    case";
+            code += $"\n        when bl.{ifa.Name}_ID is null then 'I'";
+
+            // alle Felder, die nicht PK sind hier berücksichtigen
+            var fields = ifa.Attributes.Where(a => a is InterfaceBasicAttribute)
+                                       .Select(a => (InterfaceBasicAttribute)a)
+                                       .Where(a => a.PrimaryKey == false)
+                                       .ToList<InterfaceBasicAttribute>();
+
+            if(fields.Count > 0) {
+                code += "\n        when ";
+            }
+            int i = 0; 
+            foreach(var field in fields) {
+                i++;
+                code += $"bl.{GetAttributeName(field)} <> il.{GetILAttributeName(field)}";
+                if(i < fields.Count) {
+                    code += "\n          or ";
+                }
+            }
+            if(fields.Count > 0) {
+                code += " then 'U'";
+            }
+
+            code += "\n        else 'X'";
+            code += "\n    end as T_Modifikation";
+
+            return code;
+        }
+    }
 }
