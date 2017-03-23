@@ -30,9 +30,9 @@ namespace Kdv.CeusDL.Generator.IL {
                 // Nur Tabellen, und keine Def-Tabellen die beginnen erst in BL
                 if(obj.Type != InterfaceType.DIM_VIEW && obj.Type != InterfaceType.DEF_TABLE) {
                     if(obj.IsMandantInterface()) {
-                        code += $"delete from {obj.Name} where Mandant_KNZ = @mandant;\n";
+                        code += $"delete from {GetILDatabase(model)}.dbo.{GetPrefix(model.Config)}IL_{obj.Name} where Mandant_KNZ = @mandant;\n";
                     } else {
-                        code += $"truncate table {obj.Name};\n";
+                        code += $"truncate table {GetILDatabase(model)}.dbo.{GetPrefix(model.Config)}IL_{obj.Name};\n";
                     }
                 }
             }
@@ -133,20 +133,20 @@ namespace Kdv.CeusDL.Generator.IL {
 
             // Insert-SQL-Statement generieren
             code += $"        internal static string GetInsertSQL({ifa.Name}Loader line) {{\n";
-            code += $"            string sql = \"insert into {GetILDatabase(model)}.dbo.IL_{ifa.Name} values (\";\n";
-
+            code += $"            string sql = \"insert into {GetILDatabase(model)}.dbo.{GetPrefix(model.Config)}IL_{ifa.Name} values (\";\n";
+            
+            if(ifa.IsMandantInterface()) {
+                code += $"            sql += \"'\"+line.Mandant_KNZ+\"', \";";
+            }
             i = 0;
             foreach(var attr in ifa.Attributes) {
                 i++;
                 code += $"            sql += \"'\"+line.{GetCSAttributeName(attr, ifa)}+\"'";
-                if(i < ifa.Attributes.Count && !ifa.IsMandantInterface()) {
+                if(i < ifa.Attributes.Count) {
                     code += ", \";\n";;
                 } else {
                     code += "\";\n";;
                 }                
-            }
-            if(ifa.IsMandantInterface()) {
-                code += $"            sql += \"'\"+line.Mandant_KNZ+\"'\";";
             }
 
             code += $"            sql += \");\";\n";
@@ -155,7 +155,11 @@ namespace Kdv.CeusDL.Generator.IL {
 
             // Parser-Funktion
             code += $"        internal static {ifa.Name}Loader ParseLine(string line) "+"{\n";
-            code += $"            {ifa.Name}ParserState state = {ifa.Name}ParserState.IN_{GetCSAttributeName(ifa.Attributes[0], ifa).ToUpper()};\n";
+            if(ifa.IsMandantInterface()) {
+                code += $"            {ifa.Name}ParserState state = {ifa.Name}ParserState.IN_MANDANT_KNZ;\n";
+            } else {
+                code += $"            {ifa.Name}ParserState state = {ifa.Name}ParserState.IN_{GetCSAttributeName(ifa.Attributes[0], ifa).ToUpper()};\n";
+            }
             code += $"            {ifa.Name}ParserSubstate substate = {ifa.Name}ParserSubstate.INITIAL;\n";
             code += $"            {ifa.Name}Loader content = new {ifa.Name}Loader();\n";           
             code += "            char c = ' ';\n";
@@ -163,6 +167,25 @@ namespace Kdv.CeusDL.Generator.IL {
             code += "            for(int i = 0; i < line.Length; i++) {\n";
             code += "                c = line[i];\n";
             code += "                switch(state) {\n";
+
+            if(ifa.IsMandantInterface()) {
+                code += $"                    case {ifa.Name}ParserState.IN_MANDANT_KNZ:\n";
+                code += $"                        if(substate == {ifa.Name}ParserSubstate.INITIAL && c == '\"') "+"{\n";
+                code += $"                            substate = {ifa.Name}ParserSubstate.INSTRING;\n";
+                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INITIAL && c == '\"') {\n";
+                code += "                            throw new InvalidDataException($\"Ungültiges Zeichen an Position {i}\");\n";
+                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INSTRING && c == '\"') {\n";
+                code += $"                            content.Mandant_KNZ = buf;\n";
+                code += "                            buf = \"\";\n";
+                code += $"                            substate = {ifa.Name}ParserSubstate.INITIAL;\n";
+                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INITIAL && c == ';') {\n";
+                code += $"                            state = {ifa.Name}ParserState.IN_{GetCSAttributeName(ifa.Attributes[0], ifa).ToUpper()};\n";            
+                code += "                        } else {\n";
+                code += "                            buf += c;\n";
+                code += "                        }\n";
+                code += "                        break;\n";
+
+            }
 
             for(i = 0; i < ifa.Attributes.Count; i++) {
                 InterfaceAttribute nextAttr = null;
@@ -182,11 +205,7 @@ namespace Kdv.CeusDL.Generator.IL {
                 code += $"                            substate = {ifa.Name}ParserSubstate.INITIAL;\n";
                 code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INITIAL && c == ';') {\n";
                 if(nextAttr == null) {
-                    if(ifa.IsMandantInterface()) {
-                        code += $"                            state = {ifa.Name}ParserState.IN_MANDANT_KNZ;\n";
-                    } else {
-                        code += $"                            state = {ifa.Name}ParserState.FINAL;\n";
-                    }
+                    code += $"                            state = {ifa.Name}ParserState.FINAL;\n";                    
                 } else {
                     code += $"                            state = {ifa.Name}ParserState.IN_{GetCSAttributeName(nextAttr, ifa).ToUpper()};\n";
                 }
@@ -194,25 +213,6 @@ namespace Kdv.CeusDL.Generator.IL {
                 code += "                            buf += c;\n";
                 code += "                        }\n";
                 code += "                        break;\n";
-            }
-
-            if(ifa.IsMandantInterface()) {
-                code += $"                    case {ifa.Name}ParserState.IN_MANDANT_KNZ:\n";
-                code += $"                        if(substate == {ifa.Name}ParserSubstate.INITIAL && c == '\"') "+"{\n";
-                code += $"                            substate = {ifa.Name}ParserSubstate.INSTRING;\n";
-                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INITIAL && c == '\"') {\n";
-                code += "                            throw new InvalidDataException($\"Ungültiges Zeichen an Position {i}\");\n";
-                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INSTRING && c == '\"') {\n";
-                code += $"                            content.Mandant_KNZ = buf;\n";
-                code += "                            buf = \"\";\n";
-                code += $"                            substate = {ifa.Name}ParserSubstate.INITIAL;\n";
-                code += "                        } else if(substate == "+ifa.Name+"ParserSubstate.INITIAL && c == ';') {\n";
-                code += $"                            state = {ifa.Name}ParserState.FINAL;\n";            
-                code += "                        } else {\n";
-                code += "                            buf += c;\n";
-                code += "                        }\n";
-                code += "                        break;\n";
-
             }
 
             code += "                    default:\n";

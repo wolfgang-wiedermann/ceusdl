@@ -27,6 +27,16 @@ namespace Kdv.CeusDL.Generator.IL {
         public string GenerateILTable(Interface ifa) {
             int i = 0;
             string code = $"create table {prefix}IL_{ifa.Name} (\n";            
+
+            if(ifa.IsMandantInterface()) {
+                code += "    Mandant_KNZ varchar(10) not null";
+                if(ifa.Attributes.Count > 0) {
+                    code += ",\n";
+                } else {
+                    code += "\n";
+                }
+            }
+            
             foreach(var field in ifa.Attributes) {
                 code += GenerateILTableField(field);
                 if(i+1 < ifa.Attributes.Count) {
@@ -35,11 +45,7 @@ namespace Kdv.CeusDL.Generator.IL {
                     code += "\n";
                 }
                 i++;
-            }
-
-            if(ifa.IsMandantInterface()) {
-                code += ",\n    Mandant_KNZ varchar(10) not null\n";
-            }
+            }            
             code += ");\n\n";
             return code;
         }

@@ -21,6 +21,17 @@ namespace Kdv.CeusDL.Generator.IL {
             return code;
         }
 
+        ///
+        /// Falls in config-Sektion enthalten, Prefix liefern, ansonsten leerstring
+        ///
+        protected string GetPrefix(Config conf) {
+            if(conf.HasValueFor(ConfigItemEnum.PREFIX)) {
+                return $"{conf.GetValue(ConfigItemEnum.PREFIX)}_";                
+            } else {
+                return "";
+            }
+        }
+
         public string GetILDatabase(ParserResult model) {
             if(model.Config.HasValueFor(ConfigItemEnum.IL_DATABASE)) {
                 return model.Config.GetValue(ConfigItemEnum.IL_DATABASE);
