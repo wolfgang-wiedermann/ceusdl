@@ -76,6 +76,7 @@ namespace Kdv.CeusDL.Generator.BL {
                                        .Select(a => (InterfaceBasicAttribute)a)
                                        .Where(a => a.PrimaryKey == false)
                                        .ToList<InterfaceBasicAttribute>();
+            // Evtl. fehlen hier noch die InterfaceRefAttribute => die könnten auch relevant sein!
 
             if(fields.Count > 0) {
                 code += "\n        when ";
