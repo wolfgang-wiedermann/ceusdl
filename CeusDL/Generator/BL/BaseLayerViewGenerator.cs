@@ -46,8 +46,15 @@ namespace Kdv.CeusDL.Generator.BL {
             }
 
             if(ifa.IsHistorizedInterface()) {
-                // TODO: Join-Bedingung mit gültig von und gültig bis...
-                code += "\n        -- TODO: Join-Bedingung mit gültig von und gültig bis...";
+                // TODO: Wie reagiere ich bei unterschiedlicher Granularität 
+                //       zwischen T_Gueltig_Von/T_Gueltig_Bis und dem HistoryAttribute 
+                var timeAttribute = ifa.GetHistoryAttribute();
+                if(timeAttribute == null) {
+                    code += "\n        -- ERROR: INVALID TIME AND HISTORY ATTRIBUTE";
+                } else {
+                    code += $"\n        and (il.{GetILAttributeName(timeAttribute)} >= bl.T_Gueltig_Von";
+                    code += $"\n        and il.{GetILAttributeName(timeAttribute)} < bl.T_Gueltig_Bis)";
+                }
             }
 
             code += ";\n\n";
