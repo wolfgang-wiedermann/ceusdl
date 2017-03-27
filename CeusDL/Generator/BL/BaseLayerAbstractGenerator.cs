@@ -126,9 +126,7 @@ namespace Kdv.CeusDL.Generator.BL {
                         +"_"
                         +temp.ReferencedFieldName;
                 } else {
-                    return temp.ParentInterface.Name
-                        +"_"
-                        +temp.ReferencedAttribute.ParentInterface.Name
+                    return temp.ReferencedAttribute.ParentInterface.Name
                         +"_"
                         +temp.ReferencedFieldName;
                 }
