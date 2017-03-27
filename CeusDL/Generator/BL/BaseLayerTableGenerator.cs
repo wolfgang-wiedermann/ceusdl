@@ -3,6 +3,12 @@ using System.Linq;
 using System;
 
 namespace Kdv.CeusDL.Generator.BL {
+
+    ///
+    /// Neben der einfachen Tabelle sollte auch noch ein Unique-Key für 
+    /// die PK-Attribute generiert werden (PK-Attribute sind in BL ja nicht mehr der
+    /// datebankseitige Primärschlüssel)
+    ///
     public class BaseLayerTableGenerator : BaseLayerAbstractGenerator
     {
         public override string GenerateCode(ParserResult model)
@@ -12,6 +18,7 @@ namespace Kdv.CeusDL.Generator.BL {
             foreach(var obj in model.Interfaces) {
                 if(obj.Type == InterfaceType.DIM_TABLE) {                        
                     code += GenerateCreateDimTableCode(obj, model.Config);
+                    code += GenerateUniqueConstraint(obj, model.Config);
                 } else if(obj.Type == InterfaceType.DIM_VIEW) {
                     code += "/*\n* Create a View that conforms to the following Table\n*\n* ";
                     code += GenerateCreateDimTableCode(obj, model.Config).Replace("\n", "\n* ");
@@ -20,6 +27,7 @@ namespace Kdv.CeusDL.Generator.BL {
                     code += GenerateCreateFactTableCode(obj, model);
                 } else if(obj.Type == InterfaceType.DEF_TABLE) {                    
                     code += GenerateCreateDefTableCode(obj, model.Config);
+                    code += GenerateUniqueConstraint(obj, model.Config);
                 }
             }
             return code;
@@ -112,6 +120,43 @@ namespace Kdv.CeusDL.Generator.BL {
             code += ",\n    T_Aend_DAT datetime not null";
 
             code += "\n);\n\n";
+            return code;
+        }
+
+        /// 
+        /// Erstellt ein Unique-Constraint für die Felder, die gemeinsam als
+        /// Primary Key markiert wurden
+        /// ggf. inclusive Mandant
+        ///
+        public string GenerateUniqueConstraint(Interface ifa, Config conf) {
+            string code = $"ALTER TABLE {this.GetBLDatabaseAndSchema(conf)}[{this.GetTableName(ifa, conf)}]\n";
+            code += $"ADD CONSTRAINT {this.GetTableName(ifa, conf)}_UK UNIQUE NONCLUSTERED (\n";
+
+            int i = 0;
+            if(ifa.IsMandantInterface()) {
+                code += "    Mandant_KNZ ASC";
+                i++;
+            }
+
+            // Offizielle Primärschlüssel-Attribute ermitteln
+            var list = ifa.Attributes.Where(a => a is InterfaceBasicAttribute)
+                                     .Select(a => (InterfaceBasicAttribute)a)
+                                     .Where(a => a.PrimaryKey);            
+
+            foreach(var attr in list) {                
+                if(i > 0) {
+                    code += ",\n";
+                }
+                code += $"    {this.GetAttributeName(attr)} ASC";
+                i++;
+            }
+
+            if(ifa.IsHistorizedInterface()) {
+                code += "    [T_Gueltig_Von] ASC";   
+            }
+
+            code += "\n);\n\n";
+            
             return code;
         }
 
