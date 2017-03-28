@@ -152,7 +152,7 @@ namespace Kdv.CeusDL.Generator.BL {
             }
 
             if(ifa.IsHistorizedInterface()) {
-                code += "    [T_Gueltig_Von] ASC";   
+                code += ",\n    [T_Gueltig_Von] ASC";   
             }
 
             code += "\n);\n\n";
