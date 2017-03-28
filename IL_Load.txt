@@ -1,6 +1,0 @@
-use FH_IVS_InterfaceLayer;
-
-delete from FH_IVS_InterfaceLayer.dbo.IVS_IL_Raum where Mandant_KNZ = @mandant;
-delete from FH_IVS_InterfaceLayer.dbo.IVS_IL_Gebaeude where Mandant_KNZ = @mandant;
-delete from FH_IVS_InterfaceLayer.dbo.IVS_IL_Raumnutzungsart where Mandant_KNZ = @mandant;
-delete from FH_IVS_InterfaceLayer.dbo.IVS_IL_Inventar where Mandant_KNZ = @mandant;

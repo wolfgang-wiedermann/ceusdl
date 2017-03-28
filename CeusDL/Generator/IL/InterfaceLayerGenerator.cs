@@ -51,20 +51,12 @@ namespace Kdv.CeusDL.Generator.IL {
         }
 
         public string GenerateILTableField(InterfaceAttribute attr) {
-            string code = "    ";
+            string code = $"    {GetILFieldName(attr)} ";
             if(attr is InterfaceBasicAttribute) {
-                var basic = (InterfaceBasicAttribute)attr;
-                code += $"{attr.ParentInterface.Name}_{basic.Name} ";
-                code += GetTypeFromBasic(basic);
+                code += GetTypeFromBasic((InterfaceBasicAttribute)attr);
             } else if (attr is InterfaceRefAttribute) {
-                var refer = (InterfaceRefAttribute)attr;
-                if(string.IsNullOrEmpty(refer.Alias)) {
-                    code += $"{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
-                } else {
-                    code += $"{refer.Alias}_{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
-                }
-                code += GetTypeFromBasic(refer.ReferencedAttribute);
-            }
+                code += GetTypeFromBasic(((InterfaceRefAttribute)attr).ReferencedAttribute);
+            }        
             return code;
         }
     }
