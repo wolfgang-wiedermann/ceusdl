@@ -63,7 +63,7 @@ namespace Kdv.CeusDL.Generator.BL {
                 code += $"    {GetAttributeName(attr)}";
             }            
 
-            code += ",\n    T_Modifikation, T_Ladelauf_NR, T_Benutzer, T_System, T_Erst_DAT, T_Aend_DAT";
+            code += ",\n    T_Modifikation, T_Ladelauf_NR, T_Benutzer, T_System, T_Erst_DAT, T_Aend_DAT, T_Bemerkung";
             code += "\n)\nselect\n";            
 
             if(ifa.IsMandantInterface()) {
@@ -77,7 +77,7 @@ namespace Kdv.CeusDL.Generator.BL {
             }   
 
             // TODO: 1 als Ladelaufnummer ist natürlich noch Sch...
-            code += ",\n    T_Modifikation, 1, SYSTEM_USER, 'H', GetDate(), GetDate()";
+            code += ",\n    T_Modifikation, 1, SYSTEM_USER, 'H', GetDate(), GetDate(), 'Insert bei Load BL'";
 
             code += $"\nfrom {GetViewName(ifa, model.Config)}\n";
             code += "where T_Modifikation = 'I'\n\n";
@@ -96,6 +96,7 @@ namespace Kdv.CeusDL.Generator.BL {
                     i++;
                 }
             }
+            code += ",\n    t.T_Modifikation = 'U', t.T_Bemerkung = 'Update bei Load BL', t.T_Benutzer = SYSTEM_USER, t.T_Aend_Dat = GetDate()";
             code += $"\nfrom {GetTableName(ifa, model.Config)} as t inner join {GetViewName(ifa, model.Config)} as v ";            
             code += $"\non t.{ifa.Name}_ID = v.{ifa.Name}_ID";
             code += $"\nwhere v.T_Modifikation = 'U'";
