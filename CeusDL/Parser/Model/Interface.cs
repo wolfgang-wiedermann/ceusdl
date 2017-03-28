@@ -66,7 +66,7 @@ namespace Kdv.CeusDL.Parser.Model {
                     return null;
             } else {
                 // Feld ist InterfaceBaseAttribute ...
-                var res1 = Attributes.Where(a => a is InterfaceRefAttribute)
+                var res1 = Attributes.Where(a => a is InterfaceBasicAttribute)
                                      .Select(a => (InterfaceBasicAttribute)a)
                                      .Where(a => a.Name == fieldName);
 
