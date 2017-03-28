@@ -31,6 +31,9 @@ namespace ConsoleApplication
             //var cdlGenerator = new CeusDLGenerator();
             //Console.WriteLine(cdlGenerator.GenerateCode(result));
 
+            var blDropGenerator = new BaseLayerDropGenerator();
+            File.WriteAllText("GeneratedSQL\\BL_Drop.sql", blDropGenerator.GenerateCode(result));
+
             var blGenerator = new BaseLayerGenerator();
             File.WriteAllText("GeneratedSQL\\BL_Create.sql", blGenerator.GenerateCode(result));
 
