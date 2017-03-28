@@ -12,11 +12,9 @@ namespace Kdv.CeusDL.Generator.BL {
             foreach(var obj in model.Interfaces) {
                 if(obj.Type == InterfaceType.DIM_TABLE) {
                     code += GenerateCreateViewCode(obj, model.Config);
-                } else if(obj.Type == InterfaceType.FACT_TABLE) {
-                    // TODO: Prüfen, ob der code auf bei Faktentabellen passt !!!
-                    code += GenerateCreateViewCode(obj, model.Config);
-                } 
-                // TODO: hier weiter für die anderen Inteface-Typen
+                } else if(obj.Type == InterfaceType.FACT_TABLE) {                    
+                    code += GenerateCreateFactViewCode(obj, model.Config);
+                }                 
             }
             return code;
         }
@@ -24,7 +22,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Generierung des gesamten Codes für eine Tabelle/Interface
         ///
-        /// TODO: Zerlegen in Dim- und Faktentabllen, Def-Tabellen insgesamt ausschließen...
+        /// Dimmensionstabllen
         ///
         public string GenerateCreateViewCode(Interface ifa, Config conf) {
             var il = new InterfaceLayerGenerator();
@@ -48,6 +46,7 @@ namespace Kdv.CeusDL.Generator.BL {
                 code += "\n        and il.Mandant_KNZ = bl.Mandant_KNZ";
             }
 
+/* 
             if(ifa.IsHistorizedInterface()) {
                 // TODO: Wie reagiere ich bei unterschiedlicher Granularität 
                 //       zwischen T_Gueltig_Von/T_Gueltig_Bis und dem HistoryAttribute 
@@ -59,10 +58,35 @@ namespace Kdv.CeusDL.Generator.BL {
                     code += $"\n        and il.{GetILAttributeName(timeAttribute)} < bl.T_Gueltig_Bis)";
                 }
             }
+*/ // TODO: Das mit der Historisierung hier ist noch unfertiger sch...            
 
             code += ";\n\n";
             return code;
         }
+
+        ///
+        /// Generierung des gesamten Codes für eine Tabelle/Interface
+        ///
+        /// Faktentabelle
+        ///
+        public string GenerateCreateFactViewCode(Interface ifa, Config conf) {
+            var il = new InterfaceLayerGenerator();
+            string code = $"go\ncreate view {GetViewName(ifa, conf)} as \n";
+            code += $"select null as {ifa.Name}_ID";
+
+            if(ifa.IsMandantInterface()) {                
+                code += ",\n    il.Mandant_KNZ as Mandant_KNZ";
+            }
+            foreach(var attr in ifa.Attributes) {
+                code += $",\n    il.{GetILAttributeName(attr)} as {GetAttributeName(attr)}";
+            }
+
+            code += ",\n    'I' as T_Modifikation";
+
+            code += $"\nfrom {GetILDatabaseAndSchema(conf)}{GetPrefix(conf)}IL_{ifa.Name} as il;\n\n";
+            return code;
+        }
+                
 
         ///
         /// case 

@@ -44,7 +44,8 @@ namespace Kdv.CeusDL.Generator.BL {
                     code += GenerateDimUpdateCode(ifa, model);
                     code += GenerateDimInsertCode(ifa, model);  
                 } else if(ifa.Type == InterfaceType.FACT_TABLE) {
-                    // TODO: noch zu implementieren
+                    code += $"-- BaseLayer Laden für FactTable {ifa.Name}\n";
+                    code += "-- TODO: noch zu implementieren\n\n";
                 }
             }
             return code;

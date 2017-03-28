@@ -84,11 +84,13 @@ namespace Kdv.CeusDL.Generator.BL {
 
             code += GetMandantSpalte(ifa);
 
+            /*
             if(ifa.IsHistorizedInterface()) {
                 var attr = ifa.TypeAttributes.Where(a => a.Name.Equals(InterfaceTypeAttributeEnum.HISTORY)).First();
                 var attribute = model.GetBasicAttributeByName(attr.Value); // TODO: Evtl. wie zusätzliches ref-Attribut behandeln ???
                 code += $",\n    -- Historisiert pro Ausprägung dieses Attributs\n    HIST_{GetAttributeName(attribute)} {GetAttributeType(attribute)}";
             }
+            */
 
             code += ",\n    T_Modifikation varchar(10) not null";
             code += ",\n    T_Bemerkung varchar(100)";
