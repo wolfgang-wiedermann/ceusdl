@@ -3,6 +3,7 @@ using System.IO;
 using Kdv.CeusDL.Parser;
 using Kdv.CeusDL.Generator.IL;
 using Kdv.CeusDL.Generator.BL;
+using Kdv.CeusDL.Generator.Helpers;
 
 namespace ConsoleApplication
 {
@@ -17,8 +18,9 @@ namespace ConsoleApplication
                 throw new Exception("Parsing-Vorgang mit Fehler abgebrochen ....");
             }
 
-            //Console.WriteLine(result?.ToString());
-            //Console.WriteLine();
+            var ddGenerator = new DemoDataGenerator();
+            ddGenerator.GenerateCode(result);
+            
             var ilDropGenerator = new InterfaceLayerDropGenerator();
             File.WriteAllText("GeneratedSQL\\IL_Drop.sql", ilDropGenerator.GenerateCode(result));
 

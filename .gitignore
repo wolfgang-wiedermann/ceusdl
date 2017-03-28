@@ -4,3 +4,4 @@ project.lock.json
 dsl/bewerber.ceusdl
 GeneratedCode
 GeneratedSQL
+GeneratedData

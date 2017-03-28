@@ -40,6 +40,21 @@ namespace Kdv.CeusDL.Generator.IL {
             }
         }
 
+        public string GetILFieldName(InterfaceAttribute attr) {
+            string code = "";
+            if(attr is InterfaceBasicAttribute) {
+                var basic = (InterfaceBasicAttribute)attr;
+                code += $"{attr.ParentInterface.Name}_{basic.Name}";                    
+            } else if (attr is InterfaceRefAttribute) {
+                var refer = (InterfaceRefAttribute)attr;
+                if(string.IsNullOrEmpty(refer.Alias)) {
+                    code += $"{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";                    } else {
+                    code += $"{refer.Alias}_{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
+                }                
+            }
+            return code;
+        }
+
         public string GetTypeFromBasic(InterfaceBasicAttribute basic) {
             string code = "";
             if(basic.DataType == InterfaceAttributeDataType.VARCHAR) {
