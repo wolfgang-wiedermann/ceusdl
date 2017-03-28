@@ -19,18 +19,20 @@ namespace ConsoleApplication
 
             //Console.WriteLine(result?.ToString());
             //Console.WriteLine();
+            var ilDropGenerator = new InterfaceLayerDropGenerator();
+            File.WriteAllText("GeneratedSQL\\IL_Drop.sql", ilDropGenerator.GenerateCode(result));
 
             var ilGenerator = new InterfaceLayerGenerator();
-            Console.WriteLine(ilGenerator.GenerateCode(result));
+            File.WriteAllText("GeneratedSQL\\IL_Create.sql", ilGenerator.GenerateCode(result));
 
             var ilLoadGenerator = new InterfaceLayerLoadGenerator();        
-            File.WriteAllText("IL_Load.txt", ilLoadGenerator.GenerateCode(result));
+            File.WriteAllText("GeneratedSQL\\IL_DeleteContent.sql", ilLoadGenerator.GenerateCode(result));
 
             //var cdlGenerator = new CeusDLGenerator();
             //Console.WriteLine(cdlGenerator.GenerateCode(result));
 
             var blGenerator = new BaseLayerGenerator();
-            Console.WriteLine(blGenerator.GenerateCode(result));
+            File.WriteAllText("GeneratedSQL\\BL_Create.sql", blGenerator.GenerateCode(result));
 
             Console.WriteLine();
         }
