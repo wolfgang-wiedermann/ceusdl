@@ -39,6 +39,9 @@ namespace ConsoleApplication
             var blGenerator = new BaseLayerGenerator();
             File.WriteAllText("GeneratedSQL\\BL_Create.sql", blGenerator.GenerateCode(result));
 
+            var blLGenerator = new BaseLayerLoadGenerator();
+            File.WriteAllText("GeneratedSQL\\BL_Load.sql", blLGenerator.GenerateCode(result));
+
             Console.WriteLine();
         }
     }

@@ -35,12 +35,13 @@ namespace Kdv.CeusDL.Generator.Helpers {
             content += "\n";
 
             // Inhalt rausschreiben
+            var rand = new Random();
             for(int i = 0; i < 100; i++) {
                 if(ifa.IsMandantInterface()) {
                     content += $"\"0000\"";
                 }
                 foreach(var col in ifa.Attributes) {
-                    if(col != ifa.Attributes.First()) {
+                    if(!(col == ifa.Attributes.First() && !ifa.IsMandantInterface())) {
                         content += ";";
                     }
 
@@ -48,8 +49,13 @@ namespace Kdv.CeusDL.Generator.Helpers {
                         content += $"\"KNZ{i}\"";    
                     } else if(col is InterfaceRefAttribute) {
                         content += $"\"KNZ{i}\"";    
+                    } else if(col is InterfaceBasicAttribute && ((InterfaceBasicAttribute)col).DataType == InterfaceAttributeDataType.VARCHAR) {
+                        var temp = $"\"Inhalt von {GetILFieldName(col)}";
+                        content += temp.Substring(0, Math.Min(((InterfaceBasicAttribute)col).Length, temp.Length)-1)+"\"";
+                    } else if(col is InterfaceBasicAttribute && ((InterfaceBasicAttribute)col).DataType == InterfaceAttributeDataType.INT) {
+                        content += $"\"{rand.Next()}\"";
                     } else {
-                        content += $"\"Inhalt von {GetILFieldName(col)}\"";
+                        content += $"\"1.2\"";
                     }
                 }
                 content += "\n";

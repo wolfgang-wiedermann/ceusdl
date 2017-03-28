@@ -31,6 +31,9 @@ namespace Kdv.CeusDL.Generator.BL {
             string code = $"go\ncreate view {GetViewName(ifa, conf)} as \n";
             code += $"select bl.{ifa.Name}_ID";
 
+            if(ifa.IsMandantInterface()) {                
+                code += ",\n    il.Mandant_KNZ as Mandant_KNZ";
+            }
             foreach(var attr in ifa.Attributes) {
                 code += $",\n    il.{GetILAttributeName(attr)} as {GetAttributeName(attr)}";
             }
