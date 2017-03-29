@@ -46,11 +46,11 @@ namespace Kdv.CeusDL.Generator.BL {
                     code += $"-- BaseLayer Laden für DimTable {ifa.Name}\n";
                     code += GenerateDimUpdateCode(ifa, model);
                     code += GenerateDimInsertCode(ifa, model);  
-                } else if(ifa.Type == InterfaceType.FACT_TABLE) {
-                    // TODO: hier nachher weiter machen ...                    
+                } else if(ifa.Type == InterfaceType.FACT_TABLE) {                    
                     code += $"-- BaseLayer Laden für FactTable {ifa.Name}\n";
                     code += GenerateFactDeleteCode(ifa, model);
-                    code += "-- TODO: noch zu implementieren\n\n";
+                    // Achtung: Hier wird auch die Version von Dim verwendet!
+                    code += GenerateDimInsertCode(ifa, model);                     
                 }
             }
             return code;
@@ -143,7 +143,7 @@ namespace Kdv.CeusDL.Generator.BL {
                 if(ifa.IsMandantInterface()) {
                     code += "  where Mandant_KNZ = @mandant\n";
                 } 
-                code += ")\n";
+                code += ")\n\n\n";
             }
             return code;
         }
