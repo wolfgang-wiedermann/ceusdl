@@ -46,6 +46,9 @@ namespace ConsoleApplication
 
             // Base Layer Transformation
 
+            var btDropGenerator = new BaseLayerTransDropGenerator();
+            File.WriteAllText("GeneratedSQL\\BT_Drop.sql", btDropGenerator.GenerateCode(result));
+
             var btGenerator = new BaseLayerTransTableGenerator();
             File.WriteAllText("GeneratedSQL\\BT_Create.sql", btGenerator.GenerateCode(result));
 

@@ -10,21 +10,25 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Dem Interface Namen ein BL_ voranstellen
         ///
-        protected string GetTableName(Interface ifa, Config conf) {        
-            return $"{GetPrefix(conf)}BL{GetTypeSuffix(ifa)}_{ifa.Name}";
+        public string GetTableName(Interface ifa, Config conf) {
+            if(ifa.Type == InterfaceType.DEF_TABLE) {
+                return $"{GetPrefix(conf)}def_{ifa.Name}";
+            } else {     
+                return $"{GetPrefix(conf)}BL{GetTypeSuffix(ifa)}_{ifa.Name}";
+            }
         }
 
         ///
         /// Dem Interface Namen ein BL_ voranstellen und ein _VW anhängen
         ///
-        protected string GetViewName(Interface ifa, Config conf) {
+        public string GetViewName(Interface ifa, Config conf) {
             return $"{GetPrefix(conf)}BL{GetTypeSuffix(ifa)}_{ifa.Name}_VW";
         }
 
         ///
         /// Falls in config-Sektion enthalten, Prefix liefern, ansonsten leerstring
         ///
-        protected string GetPrefix(Config conf) {
+        public string GetPrefix(Config conf) {
             if(conf.HasValueFor(ConfigItemEnum.PREFIX)) {
                 return $"{conf.GetValue(ConfigItemEnum.PREFIX)}_";                
             } else {
@@ -35,7 +39,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Ermittelt den InterfaceLayer-Datenbankprefix (DB + Schema)
         ///
-        protected string GetILDatabaseAndSchema(Config conf) {
+        public string GetILDatabaseAndSchema(Config conf) {
             if(conf.HasValueFor(ConfigItemEnum.IL_DATABASE)) {
                 return $"{conf.GetValue(ConfigItemEnum.IL_DATABASE)}.dbo.";                
             } else {
@@ -46,7 +50,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Ermittelt den InterfaceLayer-Datenbankprefix (DB + Schema)
         ///
-        protected string GetBLDatabaseAndSchema(Config conf) {
+        public string GetBLDatabaseAndSchema(Config conf) {
             if(conf.HasValueFor(ConfigItemEnum.BL_DATABASE)) {
                 return $"{conf.GetValue(ConfigItemEnum.BL_DATABASE)}.dbo.";                
             } else {
@@ -57,7 +61,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Falls erforderlich Mandant-Spalte hinzufügen
         ///
-        protected string GetMandantSpalte(Interface ifa) {
+        public string GetMandantSpalte(Interface ifa) {
             if(ifa.IsMandantInterface()) {
                 return ",\n    Mandant_KNZ varchar(10) not null";
             } else {
@@ -68,7 +72,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Get InterfaceLayer Name for Primary Key Field
         ///
-        protected string GetILPKField(Interface ifa) {
+        public string GetILPKField(Interface ifa) {
             var pk = ifa.Attributes.Where(i => i is InterfaceBasicAttribute)
                                    .Select(i => (InterfaceBasicAttribute)i)
                                    .Where(i => i.PrimaryKey);
@@ -79,7 +83,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Get BaseLayer Name for Primary Key Field
         ///
-        protected string GetBLPKField(Interface ifa) {
+        public string GetBLPKField(Interface ifa) {
             var pk = ifa.Attributes.Where(i => i is InterfaceBasicAttribute)
                                    .Select(i => (InterfaceBasicAttribute)i)
                                    .Where(i => i.PrimaryKey);
@@ -90,7 +94,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Ermittelt den BL-Kompatiblen Datentyp eines Attributs
         ///
-        protected string GetAttributeType(InterfaceAttribute attr) {
+        public string GetAttributeType(InterfaceAttribute attr) {
             if(attr is InterfaceBasicAttribute) {
                 var temp = (InterfaceBasicAttribute)attr;
                 switch(temp.DataType) {
@@ -111,7 +115,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Ermittelt einen BaseLayer-Konformen Attribut-Namen
         ///
-        protected string GetAttributeName(InterfaceAttribute attr) {
+        public string GetAttributeName(InterfaceAttribute attr) {
             if(attr is InterfaceBasicAttribute) {
                 var temp = (InterfaceBasicAttribute)attr;
                 return temp.ParentInterface.Name
@@ -139,7 +143,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         /// Ermittelt einen InterfaceLayer-Konformen Attribut-Namen
         ///
-        protected string GetILAttributeName(InterfaceAttribute attr) {
+        public string GetILAttributeName(InterfaceAttribute attr) {
             string code = "";
             if(attr is InterfaceBasicAttribute) {
                 var basic = (InterfaceBasicAttribute)attr;
@@ -155,7 +159,7 @@ namespace Kdv.CeusDL.Generator.BL {
             return code;
         }
 
-        private string GetTypeSuffix(Interface ifa) {
+        public string GetTypeSuffix(Interface ifa) {
             switch(ifa.Type) {
                 case InterfaceType.DEF_TABLE:
                     return "_DEF";                    

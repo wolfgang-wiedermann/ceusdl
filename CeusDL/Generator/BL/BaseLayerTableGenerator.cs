@@ -76,7 +76,7 @@ namespace Kdv.CeusDL.Generator.BL {
         ///
         public string GenerateCreateFactTableCode(Interface ifa, ParserResult model) {
             string code = $"create table {GetTableName(ifa, model.Config)} (\n";
-            code += $"    {ifa.Name}_ID int primary key identity not null";            
+            code += $"    {ifa.Name}_ID bigint primary key identity not null";            
 
             foreach(var attribute in ifa.Attributes) {
                 code += $",\n    {GetAttributeName(attribute)} {GetAttributeType(attribute)}";
