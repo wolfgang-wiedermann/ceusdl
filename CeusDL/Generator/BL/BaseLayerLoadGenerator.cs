@@ -38,13 +38,18 @@ namespace Kdv.CeusDL.Generator.BL {
             if(model.Config.HasValueFor(ConfigItemEnum.BL_DATABASE))  {
                 code += $"use {model.Config.GetValue(ConfigItemEnum.BL_DATABASE)}\n\n";
             }
+            
+            code += GenerateMandantParamCode();
+
             foreach(var ifa in model.Interfaces) {
                 if(ifa.Type == InterfaceType.DIM_TABLE) {
                     code += $"-- BaseLayer Laden für DimTable {ifa.Name}\n";
                     code += GenerateDimUpdateCode(ifa, model);
                     code += GenerateDimInsertCode(ifa, model);  
                 } else if(ifa.Type == InterfaceType.FACT_TABLE) {
+                    // TODO: hier nachher weiter machen ...                    
                     code += $"-- BaseLayer Laden für FactTable {ifa.Name}\n";
+                    code += GenerateFactDeleteCode(ifa, model);
                     code += "-- TODO: noch zu implementieren\n\n";
                 }
             }
@@ -81,7 +86,13 @@ namespace Kdv.CeusDL.Generator.BL {
             code += ",\n    T_Modifikation, 1, SYSTEM_USER, 'H', GetDate(), GetDate(), 'Insert bei Load BL'";
 
             code += $"\nfrom {GetViewName(ifa, model.Config)}\n";
-            code += "where T_Modifikation = 'I'\n\n";
+            code += "where T_Modifikation = 'I'";
+
+            if(ifa.IsMandantInterface()) {
+                code += " and Mandant_KNZ = @mandant\n";
+            }
+
+            code += "\n\n";
             return code;
         }
 
@@ -101,7 +112,46 @@ namespace Kdv.CeusDL.Generator.BL {
             code += $"\nfrom {GetTableName(ifa, model.Config)} as t inner join {GetViewName(ifa, model.Config)} as v ";            
             code += $"\non t.{ifa.Name}_ID = v.{ifa.Name}_ID";
             code += $"\nwhere v.T_Modifikation = 'U'";
-            code += "\ngo\n\n";
+            if(ifa.IsMandantInterface()) {
+                code += " and t.Mandant_KNZ = @mandant\n";
+            }
+            code += "\n\n";
+            return code;
+        }
+
+        ///
+        /// Löschen evtl. zu ersetzender Fakten 
+        ///
+        private string GenerateFactDeleteCode(Interface ifa, ParserResult model)
+        {
+            string code = $"delete from [dbo].[{GetTableName(ifa, model.Config)}]\n";
+
+            if(ifa.IsMandantInterface()) {
+                code += "where Mandant_KNZ = @mandant\n";
+            } 
+
+            if(ifa.IsHistorizedInterface()) {
+                if(ifa.IsMandantInterface()) {
+                    code += "and ";
+                } else {
+                    code += "where ";
+                }
+                
+                code += $"{GetAttributeName(ifa.GetHistoryAttribute())} in (\n";
+                code += $"  select distinct {GetAttributeName(ifa.GetHistoryAttribute())}\n";
+                code += $"  from [dbo].[{GetViewName(ifa, model.Config)}]\n";
+                if(ifa.IsMandantInterface()) {
+                    code += "  where Mandant_KNZ = @mandant\n";
+                } 
+                code += ")\n";
+            }
+            return code;
+        }
+
+        private string GenerateMandantParamCode()
+        {
+            string code = "DECLARE @mandant varchar(10);\n";
+            code += "SET @mandant = '0000';\n\n";
             return code;
         }
     }
