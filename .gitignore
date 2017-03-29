@@ -1,5 +1,8 @@
 bin/Debug
 obj/Debug
+obj/ceusdsl.csproj.nuget.g.props
+obj/ceusdsl.csproj.nuget.g.targets
+obj/project.assets.json
 project.lock.json
 dsl/bewerber.ceusdl
 GeneratedCode
