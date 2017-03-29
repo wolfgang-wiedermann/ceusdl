@@ -4,6 +4,8 @@
 
 use FH_AP_BaseLayer
 
+truncate table [dbo].[AP_BT_D_Land]
+
 insert into [dbo].[AP_BT_D_Land] (
        [Land_ID]
       ,[Land_KNZ]
