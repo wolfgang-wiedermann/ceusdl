@@ -27,49 +27,52 @@ namespace Kdv.CeusDL.Generator.AL {
         private string GenerateDimTable(DirectAttachedDim dimTable, ParserResult model)
         {
             var refIfa = dimTable.Attribute.ReferencedAttribute.ParentInterface;
-            var repo = new DirectAttachedDimRepository();
+            var children = GetChildInterfaces(dimTable);
+            var alias = !string.IsNullOrEmpty(dimTable.Attribute.Alias)?dimTable.Attribute.Alias+"_":"";            
 
             string code = $"-- Dimensionstabelle für Schlüssel {dimTable.Key}\n";
-            code += $"create table [dbo].[{blGenerator.GetPrefix(model.Config)}D_";
-            code += !string.IsNullOrEmpty(dimTable.Attribute.Alias)?dimTable.Attribute.Alias+"_":"";
+            code += $"create table [dbo].[{blGenerator.GetPrefix(model.Config)}D_{alias}";
             code += $"{refIfa.Name}_1_{refIfa.Name}] (\n";
-            code += $"    {refIfa.Name}_ID int not null primary key";
+            code += $"    {alias}{refIfa.Name}_ID int not null primary key";
 
             if(refIfa.IsMandantInterface()) {
                 code += $",\n    Mandant_ID int not null";
             }
 
-            code += GetDimTableBaseFields(refIfa);            
-            GetDimTableRefFields(refIfa, repo);
+            code += GetDimTableBaseFields(refIfa, alias);
 
-            foreach(var subRefIfa in repo.Dimensions.Values) {
-                code += $",\n    {subRefIfa.Attribute.ParentInterface.Name}_ID int";
-                code += GetDimTableBaseFields(subRefIfa.Attribute.ParentInterface);
-            }
+            foreach(var child in children.Dimensions) {
+                code += $",\n    {alias}{child.Value.Attribute.ReferencedAttribute.ParentInterface.Name}_ID int not null";
+                code += GetDimTableBaseFields(child.Value.Attribute.ReferencedAttribute.ParentInterface, alias);
+            }            
 
-            code += ")\n\n";
+            code += "\n)\n\n";
             return code;
         }
 
-        private void GetDimTableRefFields(Interface refIfa, DirectAttachedDimRepository repo)
-        {                        
-            foreach(var attr in refIfa.Attributes) {
-                if(attr is InterfaceRefAttribute) {
-                    var refer = (InterfaceRefAttribute)attr;
-                    repo.Add(new DirectAttachedDim(refer));
-                    GetDimTableRefFields(refer.ReferencedAttribute.ParentInterface, repo);
-                }     
+        private DirectAttachedDimRepository GetChildInterfaces(DirectAttachedDim dimTable) {
+            DirectAttachedDimRepository repo = new DirectAttachedDimRepository();            
+            var refIfa = dimTable.Attribute.ReferencedAttribute.ParentInterface;
+            var refAttrs = refIfa.Attributes
+                                 .Where(a => a is InterfaceRefAttribute)
+                                 .Select(a => (InterfaceRefAttribute)a);
+
+            foreach(var refAttr in refAttrs) {
+                repo.Add(new DirectAttachedDim(refAttr));
+                // TODO: statt dessen rekursiv auflösen!!!
             }
+
+            return repo;
         }
 
-        private string GetDimTableBaseFields(Interface refIfa)
+        private string GetDimTableBaseFields(Interface refIfa, string alias)
         {
             string code = "";            
 
             foreach(var attr in refIfa.Attributes) {
                 if(attr is InterfaceBasicAttribute) {
                     var basic = (InterfaceBasicAttribute)attr;
-                    code += $",\n    {GetColumnName(attr, null, null)} {GetColumnType(attr)}";
+                    code += $",\n    {alias}{GetColumnName(attr, null, null)} {GetColumnType(attr)}";
                 }     
             }
 
