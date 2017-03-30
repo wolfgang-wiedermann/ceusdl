@@ -137,7 +137,7 @@ namespace Kdv.CeusDL.Generator.BT {
                     code += $",\n    b.{blGenerator.GetAttributeName(attr)}";
                 } else if (attr is InterfaceRefAttribute) {                    
                     var r = (InterfaceRefAttribute)attr;
-                    code += $",\n    a{i}.{r.ReferencedAttribute.ParentInterface.Name}_ID";                    
+                    code += $",\n    isnull(a{i}.{r.ReferencedAttribute.ParentInterface.Name}_ID, -1) as {r.ReferencedAttribute.ParentInterface.Name}{i}_ID";                    
                     code += $",\n    b.{blGenerator.GetAttributeName(attr)}";
                     i++;
                 } else {
@@ -171,7 +171,7 @@ namespace Kdv.CeusDL.Generator.BT {
             foreach(var attr in ifa.Attributes) {
                 if (attr is InterfaceRefAttribute) {                    
                     var r = (InterfaceRefAttribute)attr;
-                    code += $"inner join [dbo].[{blGenerator.GetTableName(r.ReferencedAttribute.ParentInterface, model.Config)}] as a{i}\n    on ";
+                    code += $"left outer join [dbo].[{blGenerator.GetTableName(r.ReferencedAttribute.ParentInterface, model.Config)}] as a{i}\n    on ";
                     if(r.ReferencedAttribute.ParentInterface.IsMandantInterface()) {
                         code += $"b.Mandant_KNZ = a{i}.Mandant_KNZ\n    and ";
                     }
