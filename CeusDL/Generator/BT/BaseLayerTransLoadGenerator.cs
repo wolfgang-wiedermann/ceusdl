@@ -149,20 +149,19 @@ namespace Kdv.CeusDL.Generator.BT {
                   code += ",\n    cast(b.Mandant_KNZ as int) as Mandant_ID";
             }
 
-//            if(ifa.IsHistorizedInterface()) TODO: ggf. noch nötig ...
-
             code += ",\n    b.T_Modifikation";
             code += ",\n    b.T_Bemerkung";
             code += ",\n    b.T_Benutzer";
             code += ",\n    b.T_System";
             code += ",\n    b.T_Erst_DAT";
-            code += ",\n    b.T_Aend_DAT";
+            code += ",\n    GetDate()";
             code += ",\n    b.T_Ladelauf_NR";
             return code;
         }
 
         ///
         /// Baut den erforderlichen Join für das Select-Statement auf
+        /// (!!! Funktioniert nur mit Tabellen mit Einelementigem Primärschlüssel !!!)
         ///
         private string GetJoinClause(Interface ifa, ParserResult model)
         {
@@ -174,13 +173,8 @@ namespace Kdv.CeusDL.Generator.BT {
                     code += $"left outer join [dbo].[{blGenerator.GetTableName(r.ReferencedAttribute.ParentInterface, model.Config)}] as a{i}\n    on ";
                     if(r.ReferencedAttribute.ParentInterface.IsMandantInterface()) {
                         code += $"b.Mandant_KNZ = a{i}.Mandant_KNZ\n    and ";
-                    }
-                    //if(string.IsNullOrEmpty(r.Alias)) {
-                    code += $"b.{blGenerator.GetAttributeName(attr)} = a{i}.{blGenerator.GetAttributeName(r.ReferencedAttribute)}\n";
-                    //} else {
-                    //  code += $"b.{blGenerator.GetAttributeName(attr)} = a{i}.{blGenerator.GetAttributeName(r.ReferencedAttribute)}\n";
-                    // a{i}.{r.Alias}_{r.ReferencedAttribute.ParentInterface.Name}_ID\n";
-                    //}                    
+                    }                    
+                    code += $"b.{blGenerator.GetAttributeName(attr)} = a{i}.{blGenerator.GetAttributeName(r.ReferencedAttribute)}\n";                    
                     i++;
                 }                
             }

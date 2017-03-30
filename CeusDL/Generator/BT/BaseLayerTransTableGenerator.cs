@@ -48,10 +48,10 @@ namespace Kdv.CeusDL.Generator.BT {
 
             code += GetMandantSpalte(ifa);
 
-            if(ifa.IsHistorizedInterface()) {
+            /*if(ifa.IsHistorizedInterface()) {
                 code += ",\n    T_Gueltig_Von int not null";
                 code += ",\n    T_Gueltig_Bis int not null";
-            }
+            }*/
 
             code += ",\n    T_Modifikation varchar(10) not null";
             code += ",\n    T_Bemerkung varchar(100)";
