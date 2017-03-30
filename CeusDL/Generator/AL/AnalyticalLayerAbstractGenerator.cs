@@ -28,6 +28,23 @@ namespace Kdv.CeusDL.Generator.AL {
             }
         }
 
+        public object GetColumnName(InterfaceAttribute attr, Interface factTable, ParserResult model)
+        {
+            if(attr is InterfaceBasicAttribute) {
+                var a = (InterfaceBasicAttribute)attr;              
+                return blGenerator.GetAttributeName(a);                
+            } else if(attr is InterfaceRefAttribute) {
+                var a = (InterfaceRefAttribute)attr;  
+                if(string.IsNullOrEmpty(a.Alias)) {
+                    return $"{a.ReferencedAttribute.ParentInterface.Name}_ID";
+                } else {
+                    return $"{a.Alias}_{a.ReferencedAttribute.ParentInterface.Name}_ID";
+                }            
+            } else {
+                throw new NotImplementedException();
+            }    
+        }
+
         public string GetUseStatement(ParserResult model) {
             if(model.Config.HasValueFor(ConfigItemEnum.AL_DATABASE)) {
                 return $"use {model.Config.GetValue(ConfigItemEnum.AL_DATABASE)}\n\n";
@@ -37,25 +54,22 @@ namespace Kdv.CeusDL.Generator.AL {
 
         public List<Interface> GetFactTables(ParserResult model) {
             return model.Interfaces.Where(i => i.Type == InterfaceType.FACT_TABLE).ToList<Interface>();
-        }
+        }      
 
-        public List<Interface> GetDirectAttachedDimensions(ParserResult model) {
-            HashSet<Interface> directAttached = new HashSet<Interface>();
-            var factTables = GetFactTables(model);
+        public List<InterfaceRefAttribute> GetDirectAttachedDimensions(Interface factTable, ParserResult model) {
+            HashSet<InterfaceRefAttribute> directAttached = new HashSet<InterfaceRefAttribute>();
+            
+            var refAttributes = factTable.Attributes
+                .Where(a => a is InterfaceRefAttribute)
+                .Select(a => (InterfaceRefAttribute)a)                
+                .Where(a => a.ReferencedAttribute.ParentInterface.Type != InterfaceType.FACT_TABLE)
+                .ToList<InterfaceRefAttribute>();
 
-            foreach(var factTable in factTables) {
-
-                var refAttributes = factTable.Attributes
-                    .Where(a => a is InterfaceRefAttribute)
-                    .Select(a => (InterfaceRefAttribute)a)
-                    .ToList<InterfaceRefAttribute>();
-
-                foreach(var attr in refAttributes) {
-                    directAttached.Add(attr.ReferencedAttribute.ParentInterface);
-                }
+            foreach(var attr in refAttributes) {                
+                directAttached.Add(attr);
             }
-
-            return directAttached.ToList<Interface>();
+            
+            return directAttached.ToList<InterfaceRefAttribute>();
         }
 
     }
