@@ -4,6 +4,7 @@ using Kdv.CeusDL.Parser;
 using Kdv.CeusDL.Generator.IL;
 using Kdv.CeusDL.Generator.BL;
 using Kdv.CeusDL.Generator.BT;
+using Kdv.CeusDL.Generator.AL;
 using Kdv.CeusDL.Generator.Helpers;
 
 namespace ConsoleApplication
@@ -54,6 +55,11 @@ namespace ConsoleApplication
 
             var btLoadGenerator = new BaseLayerTransLoadGenerator();
             File.WriteAllText("GeneratedSQL\\BT_Load.sql", btLoadGenerator.GenerateCode(result));
+
+            // Analytical Layer
+
+            var alGenerator = new AnalyticalLayerTableGenerator();
+            File.WriteAllText("GeneratedSQL\\AL_Create.sql", alGenerator.GenerateCode(result));
 
             Console.WriteLine();
         }
