@@ -68,7 +68,19 @@ namespace Kdv.CeusDL.Generator.AL {
 
         private object GetColumnName(InterfaceAttribute attr, Interface factTable, ParserResult model)
         {
-            return "TODO";
+            if(attr is InterfaceBasicAttribute) {
+                var a = (InterfaceBasicAttribute)attr;              
+                return blGenerator.GetAttributeName(a);                
+            } else if(attr is InterfaceRefAttribute) {
+                var a = (InterfaceRefAttribute)attr;  
+                if(string.IsNullOrEmpty(a.Alias)) {
+                    return $"{a.ReferencedAttribute.ParentInterface.Name}_ID";
+                } else {
+                    return $"{a.Alias}_{a.ReferencedAttribute.ParentInterface.Name}_ID";
+                }            
+            } else {
+                throw new NotImplementedException();
+            }    
         }
     }
 }
