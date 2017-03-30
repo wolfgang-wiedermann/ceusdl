@@ -52,6 +52,9 @@ namespace ConsoleApplication
             var btGenerator = new BaseLayerTransTableGenerator();
             File.WriteAllText("GeneratedSQL\\BT_Create.sql", btGenerator.GenerateCode(result));
 
+            var btLoadGenerator = new BaseLayerTransLoadGenerator();
+            File.WriteAllText("GeneratedSQL\\BT_Load.sql", btLoadGenerator.GenerateCode(result));
+
             Console.WriteLine();
         }
     }
