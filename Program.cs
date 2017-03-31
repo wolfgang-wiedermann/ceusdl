@@ -26,40 +26,40 @@ namespace ConsoleApplication
             // Interface Layer
             
             var ilDropGenerator = new InterfaceLayerDropGenerator();
-            File.WriteAllText("GeneratedSQL\\IL_Drop.sql", ilDropGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "IL_Drop.sql"), ilDropGenerator.GenerateCode(result));
 
             var ilGenerator = new InterfaceLayerGenerator();
-            File.WriteAllText("GeneratedSQL\\IL_Create.sql", ilGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "IL_Create.sql"), ilGenerator.GenerateCode(result));
 
             var ilLoadGenerator = new InterfaceLayerLoadGenerator();        
-            File.WriteAllText("GeneratedSQL\\IL_DeleteContent.sql", ilLoadGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "IL_DeleteContent.sql"), ilLoadGenerator.GenerateCode(result));
 
             // Base Layer
 
             var blDropGenerator = new BaseLayerDropGenerator();
-            File.WriteAllText("GeneratedSQL\\BL_Drop.sql", blDropGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Drop.sql"), blDropGenerator.GenerateCode(result));
 
             var blGenerator = new BaseLayerGenerator();
-            File.WriteAllText("GeneratedSQL\\BL_Create.sql", blGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Create.sql"), blGenerator.GenerateCode(result));
 
             var blLGenerator = new BaseLayerLoadGenerator();
-            File.WriteAllText("GeneratedSQL\\BL_Load.sql", blLGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Load.sql"), blLGenerator.GenerateCode(result));
 
             // Base Layer Transformation
 
             var btDropGenerator = new BaseLayerTransDropGenerator();
-            File.WriteAllText("GeneratedSQL\\BT_Drop.sql", btDropGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "BT_Drop.sql"), btDropGenerator.GenerateCode(result));
 
             var btGenerator = new BaseLayerTransTableGenerator();
-            File.WriteAllText("GeneratedSQL\\BT_Create.sql", btGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "BT_Create.sql"), btGenerator.GenerateCode(result));
 
             var btLoadGenerator = new BaseLayerTransLoadGenerator();
-            File.WriteAllText("GeneratedSQL\\BT_Load.sql", btLoadGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "BT_Load.sql"), btLoadGenerator.GenerateCode(result));
 
             // Analytical Layer
 
             var alGenerator = new AnalyticalLayerTableGenerator();
-            File.WriteAllText("GeneratedSQL\\AL_Create.sql", alGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "AL_Create.sql"), alGenerator.GenerateCode(result));
 
             Console.WriteLine();
         }
