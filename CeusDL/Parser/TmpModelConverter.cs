@@ -79,6 +79,8 @@ namespace Kdv.CeusDL.Parser {
                 return ToInterfaceBasicAttribute(input);
             } else if(input.AttributeType == TmpInterfaceAttributeType.REF) {
                 return ToInterfaceRefAttribute(input);
+            } else if(input.AttributeType == TmpInterfaceAttributeType.FACT) {
+                return ToInterfaceFact(input);                
             } else {
                 throw new NotSupportedException();
             }
@@ -90,8 +92,17 @@ namespace Kdv.CeusDL.Parser {
             return attr;
         }
 
+        private InterfaceFact ToInterfaceFact(TmpInterfaceAttribute input) {
+            var attr = new InterfaceFact();
+            return (InterfaceFact)ToInterfaceBasicAttribute_common(input, attr);
+        }
+
         private InterfaceBasicAttribute ToInterfaceBasicAttribute(TmpInterfaceAttribute input) {
             var attr = new InterfaceBasicAttribute();
+            return ToInterfaceBasicAttribute_common(input, attr);
+        }
+
+        private InterfaceBasicAttribute ToInterfaceBasicAttribute_common(TmpInterfaceAttribute input, InterfaceBasicAttribute attr) {
             attr.Name = input.Name;            
             // DataType
             if(input.DataType.Equals("decimal")) {

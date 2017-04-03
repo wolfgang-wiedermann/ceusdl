@@ -9,26 +9,16 @@ namespace Kdv.CeusDL.Generator.AL {
         protected BL.BaseLayerTableGenerator blGenerator = new BL.BaseLayerTableGenerator();
         public abstract string GenerateCode(ParserResult model);
 
-        protected string GetMandantSpalte(Interface ifa)
-        {
-            if(ifa.IsMandantInterface()) {
-                return ",\n    Mandant_ID int not null";
-            } else {
-                return "";
-            }
-        }
-
         protected object GetTableName(Interface ifa, Config conf)
         {
             if(ifa.Type == InterfaceType.FACT_TABLE) {
                 return $"{blGenerator.GetPrefix(conf)}F_{ifa.Name}";                
             } else {
-                // TODO: hier muss ich noch drübber!!!
-                return $"{blGenerator.GetPrefix(conf)}D_TODO_{ifa.Name}";
+                throw new NotImplementedException();
             }
         }
 
-        public object GetColumnName(InterfaceAttribute attr, Interface factTable, ParserResult model)
+        public string GetColumnName(InterfaceAttribute attr, Interface factTable, ParserResult model)
         {
             if(attr is InterfaceBasicAttribute) {
                 var a = (InterfaceBasicAttribute)attr;              

@@ -4,7 +4,7 @@ using static Kdv.CeusDL.Parser.TmpModel.TmpInterfaceAttributeType;
 namespace Kdv.CeusDL.Parser.TmpModel
 {
     internal enum TmpInterfaceAttributeType {
-        BASE, REF
+        BASE, FACT, REF
     }
     
     internal class TmpInterfaceAttribute {
@@ -26,7 +26,7 @@ namespace Kdv.CeusDL.Parser.TmpModel
             if(AttributeType == TmpInterfaceAttributeType.REF) {
                 return !string.IsNullOrEmpty(ForeignInterface)
                     && !string.IsNullOrEmpty(ReferencedField);
-            } else if(AttributeType == TmpInterfaceAttributeType.BASE) {
+            } else if(AttributeType == TmpInterfaceAttributeType.BASE || AttributeType == TmpInterfaceAttributeType.FACT) {
                 return !string.IsNullOrEmpty(Name)
                     && !string.IsNullOrEmpty(DataType);
             }

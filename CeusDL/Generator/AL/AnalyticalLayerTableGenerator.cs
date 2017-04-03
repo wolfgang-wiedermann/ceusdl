@@ -17,65 +17,31 @@ namespace Kdv.CeusDL.Generator.AL {
                 dimRepo.AddRange(GetDirectAttachedDimensions(factTable, model));                
             }
 
-            foreach(var dimTable in dimRepo.Dimensions.Values) {                
-                code += GenerateDimTable(dimTable, model);
+            foreach(var dimTable in dimRepo.Dimensions.Values) {
+                // Test
+                var dim = new AnalyticalDimTable(dimTable.Attribute, model);
+                // End of Test                
+                code += GenerateDimTable(dim, model);
             }
 
             return code;            
         }
 
-        private string GenerateDimTable(DirectAttachedDim dimTable, ParserResult model)
-        {
-            var refIfa = dimTable.Attribute.ReferencedAttribute.ParentInterface;
-            var children = GetChildInterfaces(dimTable);
-            var alias = !string.IsNullOrEmpty(dimTable.Attribute.Alias)?dimTable.Attribute.Alias+"_":"";            
-
-            string code = $"-- Dimensionstabelle für Schlüssel {dimTable.Key}\n";
-            code += $"create table [dbo].[{blGenerator.GetPrefix(model.Config)}D_{alias}";
-            code += $"{refIfa.Name}_1_{refIfa.Name}] (\n";
-            code += $"    {alias}{refIfa.Name}_ID int not null primary key";
-
-            if(refIfa.IsMandantInterface()) {
-                code += $",\n    Mandant_ID int not null";
+        private string GenerateDimTable(AnalyticalDimTable dim, ParserResult model)
+        {                
+            string code = $"-- Dimensionstabelle für Schlüssel {dim.Name}\n";
+            code += $"create table [dbo].[{dim.Name}] (\n";
+            foreach(var field in dim.Attributes) {
+                if(field is InterfaceBasicAttribute) {
+                    var basic = (InterfaceBasicAttribute)field;
+                    if(field == dim.Attributes.First()) {
+                        code += $"    {basic.Name} {GetColumnType(field)}";
+                    } else {
+                        code += $",\n    {basic.Name} {GetColumnType(field)}";
+                    }
+                }   
             }
-
-            code += GetDimTableBaseFields(refIfa, alias);
-
-            foreach(var child in children.Dimensions) {
-                code += $",\n    {alias}{child.Value.Attribute.ReferencedAttribute.ParentInterface.Name}_ID int not null";
-                code += GetDimTableBaseFields(child.Value.Attribute.ReferencedAttribute.ParentInterface, alias);
-            }            
-
             code += "\n)\n\n";
-            return code;
-        }
-
-        private DirectAttachedDimRepository GetChildInterfaces(DirectAttachedDim dimTable) {
-            DirectAttachedDimRepository repo = new DirectAttachedDimRepository();            
-            var refIfa = dimTable.Attribute.ReferencedAttribute.ParentInterface;
-            var refAttrs = refIfa.Attributes
-                                 .Where(a => a is InterfaceRefAttribute)
-                                 .Select(a => (InterfaceRefAttribute)a);
-
-            foreach(var refAttr in refAttrs) {
-                repo.Add(new DirectAttachedDim(refAttr));
-                // TODO: statt dessen rekursiv auflösen!!!
-            }
-
-            return repo;
-        }
-
-        private string GetDimTableBaseFields(Interface refIfa, string alias)
-        {
-            string code = "";            
-
-            foreach(var attr in refIfa.Attributes) {
-                if(attr is InterfaceBasicAttribute) {
-                    var basic = (InterfaceBasicAttribute)attr;
-                    code += $",\n    {alias}{GetColumnName(attr, null, null)} {GetColumnType(attr)}";
-                }     
-            }
-
             return code;
         }
 
@@ -95,6 +61,21 @@ namespace Kdv.CeusDL.Generator.AL {
                     code += ",";
                 }
                 code += "\n";
+                // TODO: das muss mittelfristig auch rekursiv aufgelöst werden
+                if(attr is InterfaceRefAttribute 
+                    && ((InterfaceRefAttribute)attr)?.ReferencedAttribute?.ParentInterface.Type == InterfaceType.FACT_TABLE) {
+                        var subTable = ((InterfaceRefAttribute)attr)?.ReferencedAttribute?.ParentInterface;
+                        foreach(var attr2 in subTable.Attributes) {
+                            if(!(attr2 is InterfaceFact)) {
+                                // Problem: die Fakten sollen natürlich nicht mit übernommen werden!!!
+                                code += $"    {GetColumnName(attr2, subTable, model)} {GetColumnType(attr2)}";
+                                if(subTable.Attributes.Last() != attr) {
+                                    code += ",";
+                                }
+                                code += "\n";
+                            }
+                        }
+                }                
             }            
 
             code += ")\n\n";

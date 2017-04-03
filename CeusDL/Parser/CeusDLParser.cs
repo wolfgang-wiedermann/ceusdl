@@ -311,7 +311,14 @@ namespace Kdv.CeusDL.Parser
                         this.currentInterfaceAttribute = new TmpInterfaceAttribute();
                         this.currentInterface.Attributes.Add(this.currentInterfaceAttribute);
                         this.currentInterfaceAttribute.AttributeType = TmpInterfaceAttributeType.REF;
-                        this.state = IN_INTERFACE_ATTRIBUTE_FOREIGN_IFA;                            break;
+                        this.state = IN_INTERFACE_ATTRIBUTE_FOREIGN_IFA;                            
+                        break;
+                    case "fact":
+                        this.currentInterfaceAttribute = new TmpInterfaceAttribute();
+                        this.currentInterface.Attributes.Add(this.currentInterfaceAttribute);
+                        this.currentInterfaceAttribute.AttributeType = TmpInterfaceAttributeType.FACT;
+                        this.state = IN_INTERFACE_ATTRIBUTE_NAME;
+                        break;
                     default:
                         throw new InvalidTokenException(buf);
                 }
