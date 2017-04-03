@@ -53,7 +53,7 @@ namespace Kdv.CeusDL.Generator.AL {
 
             foreach(var attr in m.Attributes.Select(a => (InterfaceBasicAttribute)a)) {
                 code += $"    {attr.Name} {GetColumnType(attr)}";
-                if(factTable.Attributes.Last() != attr) {
+                if(m.Attributes.Last() != attr) {
                     code += ",";
                 }
                 code += "\n";                
