@@ -5,6 +5,7 @@ using System;
 
 namespace Kdv.CeusDL.Generator.AL {
 
+    [ObsoleteAttribute]
     public class DirectAttachedDim {
 
         public DirectAttachedDim(InterfaceRefAttribute attribute) {
@@ -16,6 +17,7 @@ namespace Kdv.CeusDL.Generator.AL {
         public InterfaceRefAttribute Attribute { get; private set; }
     }
 
+    [ObsoleteAttribute]
     public class DirectAttachedDimRepository {
         public Dictionary<string, DirectAttachedDim> Dimensions { get; private set; }
 

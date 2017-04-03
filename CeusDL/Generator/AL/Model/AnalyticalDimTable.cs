@@ -8,30 +8,10 @@ using System.Collections.Generic;
 using Kdv.CeusDL.Parser.Model;
 
 namespace Kdv.CeusDL.Generator.AL {
-    internal class AnalyticalDimTable {
-
-        internal string Name { get; set; }
-        internal string Alias { get; set; }
-        internal List<InterfaceAttribute> Attributes = new List<InterfaceAttribute>();
-        private Dictionary<string, InterfaceAttribute> AttributeDict = new Dictionary<string, InterfaceAttribute>();
+    internal class AnalyticalDimTable : AnalyticalAbstractTable {        
+        internal string Alias { get; set; }        
         private List<InterfaceRefAttribute> Children = new List<InterfaceRefAttribute>();
-
-        private void Add(InterfaceBasicAttribute attr) {
-            if(!AttributeDict.ContainsKey(attr.Name)) {
-                AttributeDict.Add(attr.Name, attr);
-                Attributes.Add(attr);
-            }
-        }
-
-        internal string GetAlias() {
-            if(string.IsNullOrEmpty(Alias)) {
-                return "";
-            } else {
-                return $"{Alias}_";
-            }
-        }
-
-        internal AnalyticalDimTable(InterfaceRefAttribute reference, ParserResult model) {
+        internal AnalyticalDimTable(InterfaceRefAttribute reference, ParserResult model)  {
             Alias = reference.Alias;            
             var baseTable = reference.ReferencedAttribute.ParentInterface;
             var blGenerator = new BL.BaseLayerTableGenerator();            
@@ -114,5 +94,14 @@ namespace Kdv.CeusDL.Generator.AL {
                 Console.WriteLine($"ERROR: {attr.Alias}_{attr.ReferencedAttribute.ParentInterface} bereits enthalten...");
             }
         }
+
+        internal string GetAlias() {
+            if(string.IsNullOrEmpty(Alias)) {
+                return "";
+            } else {
+                return $"{Alias}_";
+            }
+        }
+
     }
 }
