@@ -58,6 +58,9 @@ namespace ConsoleApplication
 
             // Analytical Layer
 
+            var alDropGenerator = new AnalyticalLayerDropGenerator();
+            File.WriteAllText(Path.Combine("GeneratedSQL", "AL_Drop.sql"), alDropGenerator.GenerateCode(result));    
+
             var alGenerator = new AnalyticalLayerTableGenerator();
             File.WriteAllText(Path.Combine("GeneratedSQL", "AL_Create.sql"), alGenerator.GenerateCode(result));            
 

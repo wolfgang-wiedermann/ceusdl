@@ -10,6 +10,7 @@ using Kdv.CeusDL.Parser.Model;
 namespace Kdv.CeusDL.Generator.AL {
     internal class AnalyticalAbstractTable {        
         internal string Name { get; set; }
+        internal Interface MainInterface {get;set;}
         internal List<InterfaceAttribute> Attributes = new List<InterfaceAttribute>();
         private Dictionary<string, InterfaceAttribute> AttributeDict = new Dictionary<string, InterfaceAttribute>();
 

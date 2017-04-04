@@ -12,8 +12,9 @@ namespace Kdv.CeusDL.Generator.AL {
         internal string Alias { get; set; }        
         private List<InterfaceRefAttribute> Children = new List<InterfaceRefAttribute>();
         internal AnalyticalDimTable(InterfaceRefAttribute reference, ParserResult model)  {
-            Alias = reference.Alias;            
+            Alias = reference.Alias;                        
             var baseTable = reference.ReferencedAttribute.ParentInterface;
+            MainInterface = baseTable;
             var blGenerator = new BL.BaseLayerTableGenerator();            
             Name = $"{blGenerator.GetPrefix(model.Config)}D_{GetAlias()}{baseTable.Name}_1_{baseTable.Name}";
 

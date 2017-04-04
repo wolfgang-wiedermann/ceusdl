@@ -13,6 +13,7 @@ namespace Kdv.CeusDL.Generator.AL {
         internal AnalyticalFactTable(Interface baseTable, ParserResult model) {
             var blGenerator = new BL.BaseLayerTableGenerator();            
             Name = $"{blGenerator.GetPrefix(model.Config)}F_{baseTable.Name}";
+            MainInterface = baseTable;
 
             // Die ID-Spalte wird hier nicht berücksichtigt, sondern statisch
             // in der Generierung eingebracht, (wegen bigint)
