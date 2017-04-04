@@ -27,38 +27,70 @@ namespace Kdv.CeusDL.Generator.AL {
 
         private string GenerateDimTable(AnalyticalDimTable dim, ParserResult model)
         {                
+            var btGenerator = new BT.BaseLayerTransTableGenerator();
+            string joincode = "";
+            string selectcode = "select ";
+            Dictionary<Interface, string> alias = new Dictionary<Interface, string>();
+
             string code = $"-- Laden der Dimensionstabelle {dim.Name}\n";            
+            code += $"truncate table [dbo].[{dim.Name}]\n\n";
+            code += $"insert into [dbo].[{dim.Name}] (";
             
+            int i = 0;
+            var tables = dim.Attributes.Select(a => a.ParentInterface).Distinct<Interface>();
+            foreach(var table in tables) {
+                  alias.Add(table, $"t{i}"); 
+                  i++;
+            }
+
+            i = 0;
+            foreach(var table in tables) {                                   
+
+                  if(table == dim.MainInterface) {
+                        joincode += $"from {GetBTDatabaseIfExists(model)}[dbo].[{btGenerator.GetTableName(table, model.Config)}] as t{i}\n";
+                  } else {
+                        joincode += $"left outer join {GetBTDatabaseIfExists(model)}[dbo].[{btGenerator.GetTableName(table, model.Config)}] as t{i}\n";                                                
+                        joincode += $"   on {GetRefAlias(alias, table, dim)}.{table.Name}_ID = t{i}.{table.Name}_ID\n";
+                  }
+
+                  var attrs = dim.Attributes
+                                 .Where(a => a.ParentInterface == table)
+                                 .Select(a => (DerivedInterfaceBasicAttribute)a);
+
+                  foreach(var attr in attrs) {
+                        if(attr.Name == "Mandant_ID") {
+                              selectcode += $"\n    t{i}.{attr.Name} as {attr.Name}";
+                        } else {
+                              selectcode += $"\n    t{i}.{blGenerator.GetAttributeName(attr.BaseAttribute)} as {attr.Name}";
+                        }
+                        code += $"\n    {attr.Name}";
+
+                        if(!(attr == attrs.Last() && table == tables.Last())) {
+                              selectcode += ",";
+                              code += ",";
+                        } 
+                  }
+
+                  i++;
+            }
+
+            code += "\n)\n";
+            code += selectcode;
+            code += "\n";
+            code += joincode;
+            code += "\n";
+
             return code;
         }
 
-/*
+        private string GetRefAlias(Dictionary<Interface, string> alias, Interface table, AnalyticalDimTable dim) {
+            var attr = dim.Attributes
+                          .Where(a => a.ParentInterface == table)
+                          .Select(a => (DerivedInterfaceBasicAttribute)a)
+                          .First().ReferenceBase;
+            return alias[attr];
+        }
 
-SQL zum Laden einer Faktentabelle:
-
-select a.[Antrag_ID]
-      ,a.[Mandant_ID]
-      ,a.[Antrag_Antragsnummer]
-      ,a.[Antrag_Liefertag]
-      ,a.[Antrag_Anzahl_F]
-      ,t1.[Bewerber_ID]
-      ,t1.[Bewerber_Bewerbernummer]
-      ,t1.[Bewerber_Liefertag]
-      ,t1.[Geschlecht_ID]
-      ,t1.[Semester_ID]
-      ,t1.[HochschulSemester_ID]
-      ,t1.[FachSemester_ID]
-      ,t1.[HZBArt_ID]
-      ,t1.[HZBNote_ID]
-      ,t1.[HZB_Kreis_ID]
-      ,t1.[Heimatort_Kreis_ID]
-      ,t1.[Staatsangehoerigkeit_Land_ID]
-      ,a.[StudiengangHisInOne_ID]
-from FH_AP_BaseLayer.dbo.AP_BT_F_Antrag a
-inner join FH_AP_BaseLayer.dbo.AP_BT_F_Bewerber t1
-on a.Bewerber_ID = t1.Bewerber_ID
-
- */
         private string GenerateFactTable(AnalyticalFactTable fact, ParserResult model)
         {           
             var btGenerator = new BT.BaseLayerTransTableGenerator();

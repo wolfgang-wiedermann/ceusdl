@@ -19,34 +19,44 @@ namespace Kdv.CeusDL.Generator.AL {
             Name = $"{blGenerator.GetPrefix(model.Config)}D_{GetAlias()}{baseTable.Name}_1_{baseTable.Name}";
 
             // ID-Spalte einfügen            
-            Add(new InterfaceBasicAttribute() {
+            Add(new DerivedInterfaceBasicAttribute() {
                 Name=$"{GetAlias()}{baseTable.Name}_ID",
                 DataType=InterfaceAttributeDataType.INT,
                 PrimaryKey=false,
-                ParentInterface=baseTable
+                ParentInterface=baseTable,
+                BaseAttribute= new InterfaceBasicAttribute() {
+                    Name=$"ID",
+                    DataType=InterfaceAttributeDataType.INT,
+                    PrimaryKey=false,
+                    ParentInterface=baseTable
+                },
+                ReferenceBase=baseTable
             });
 
             if(baseTable.IsMandantInterface()) {
                 // Mandant-Spalte einfügen
-                Add(new InterfaceBasicAttribute() {
+                Add(new DerivedInterfaceBasicAttribute() {
                     Name="Mandant_ID",
                     DataType=InterfaceAttributeDataType.INT,
                     PrimaryKey=false,
-                    ParentInterface=baseTable
+                    ParentInterface=baseTable,
+                    ReferenceBase=baseTable
                 });                
             }
 
             // Basis-Attribute und Fakten einfügen
             foreach(var attr in baseTable.Attributes.Where(a => a is InterfaceBasicAttribute)) {
                 var basic = (InterfaceBasicAttribute)attr;
-                Add(new InterfaceBasicAttribute() {
+                Add(new DerivedInterfaceBasicAttribute() {
                     Name=$"{GetAlias()}{baseTable.Name}_{basic.Name}",
                     DataType=basic.DataType,
                     PrimaryKey=basic.PrimaryKey,
                     ParentInterface=basic.ParentInterface,
                     Length=basic.Length,
                     Decimals=basic.Decimals, 
-                    Unit=basic.Unit
+                    Unit=basic.Unit,
+                    BaseAttribute=basic,
+                    ReferenceBase=baseTable
                 });                
             }
 
@@ -64,24 +74,33 @@ namespace Kdv.CeusDL.Generator.AL {
                 var baseTable = attr.ReferencedAttribute.ParentInterface;
 
                 // ID-Spalte einfügen            
-                Add(new InterfaceBasicAttribute() {
+                Add(new DerivedInterfaceBasicAttribute() {
                     Name=$"{GetAlias()}{baseTable.Name}_ID",
                     DataType=InterfaceAttributeDataType.INT,
                     PrimaryKey=false,
-                    ParentInterface=baseTable
+                    ParentInterface=baseTable,
+                    BaseAttribute= new InterfaceBasicAttribute() {
+                        Name=$"ID",
+                        DataType=InterfaceAttributeDataType.INT,
+                        PrimaryKey=false,
+                        ParentInterface=baseTable
+                    },
+                    ReferenceBase=attr.ParentInterface
                 });
 
                 // Basis-Attribute und Fakten einfügen
                 foreach(var tmpAttr in baseTable.Attributes.Where(a => a is InterfaceBasicAttribute)) {
                     var basic = (InterfaceBasicAttribute)tmpAttr;
-                    Add(new InterfaceBasicAttribute() {
+                    Add(new DerivedInterfaceBasicAttribute() {
                         Name=$"{GetAlias()}{baseTable.Name}_{basic.Name}",
                         DataType=basic.DataType,
                         PrimaryKey=basic.PrimaryKey,
                         ParentInterface=basic.ParentInterface,
                         Length=basic.Length,
                         Decimals=basic.Decimals, 
-                        Unit=basic.Unit
+                        Unit=basic.Unit,
+                        BaseAttribute=basic,
+                        ReferenceBase=attr.ParentInterface
                     });                
                 }
 

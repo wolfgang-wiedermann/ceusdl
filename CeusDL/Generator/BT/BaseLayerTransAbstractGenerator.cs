@@ -20,7 +20,11 @@ namespace Kdv.CeusDL.Generator.BT {
 
         public object GetTableName(Interface ifa, Config conf)
         {
-            return $"{blGenerator.GetPrefix(conf)}BT{blGenerator.GetTypeSuffix(ifa)}_{ifa.Name}";
+            if(ifa.Type == InterfaceType.DEF_TABLE) {
+                return blGenerator.GetTableName(ifa, conf);
+            } else {
+                return $"{blGenerator.GetPrefix(conf)}BT{blGenerator.GetTypeSuffix(ifa)}_{ifa.Name}";
+            }
         }
 
         public string GetUseStatement(ParserResult model) {

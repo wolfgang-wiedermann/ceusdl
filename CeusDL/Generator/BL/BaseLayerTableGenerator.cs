@@ -135,7 +135,10 @@ namespace Kdv.CeusDL.Generator.BL {
             code += $"ADD CONSTRAINT {this.GetTableName(ifa, conf)}_UK UNIQUE NONCLUSTERED (\n";
 
             int i = 0;
-            if(ifa.IsMandantInterface()) {
+            if(ifa.IsMandantInterface() && ifa.Type == InterfaceType.DEF_TABLE) {
+                code += "    Mandant_ID ASC";
+                i++;
+            } else if(ifa.IsMandantInterface() && ifa.Type != InterfaceType.DEF_TABLE) {
                 code += "    Mandant_KNZ ASC";
                 i++;
             }

@@ -62,8 +62,10 @@ namespace Kdv.CeusDL.Generator.BL {
         /// Falls erforderlich Mandant-Spalte hinzufügen
         ///
         public string GetMandantSpalte(Interface ifa) {
-            if(ifa.IsMandantInterface()) {
+            if(ifa.IsMandantInterface() && ifa.Type != InterfaceType.DEF_TABLE) {
                 return ",\n    Mandant_KNZ varchar(10) not null";
+            } else if(ifa.IsMandantInterface() && ifa.Type == InterfaceType.DEF_TABLE) {
+                return ",\n    Mandant_ID int not null";
             } else {
                 return "";
             }

@@ -171,9 +171,11 @@ namespace Kdv.CeusDL.Generator.BT {
                 if (attr is InterfaceRefAttribute) {                    
                     var r = (InterfaceRefAttribute)attr;
                     code += $"left outer join [dbo].[{blGenerator.GetTableName(r.ReferencedAttribute.ParentInterface, model.Config)}] as a{i}\n    on ";
-                    if(r.ReferencedAttribute.ParentInterface.IsMandantInterface()) {
+                    if(r.ReferencedAttribute.ParentInterface.IsMandantInterface() && r.ReferencedAttribute.ParentInterface.Type == InterfaceType.DEF_TABLE) {
+                        code += $"b.Mandant_KNZ = a{i}.Mandant_ID\n    and ";
+                    } else if(r.ReferencedAttribute.ParentInterface.IsMandantInterface()) {
                         code += $"b.Mandant_KNZ = a{i}.Mandant_KNZ\n    and ";
-                    }                    
+                    }                
                     code += $"b.{blGenerator.GetAttributeName(attr)} = a{i}.{blGenerator.GetAttributeName(r.ReferencedAttribute)}\n";                    
                     i++;
                 }                
