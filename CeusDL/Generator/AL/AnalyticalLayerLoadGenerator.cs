@@ -62,8 +62,9 @@ on a.Bewerber_ID = t1.Bewerber_ID
         private string GenerateFactTable(AnalyticalFactTable fact, ParserResult model)
         {           
             var btGenerator = new BT.BaseLayerTransTableGenerator();
-            string joincode = "";
+            string joincode = "";            
             string code = $"-- Laden der Faktentabelle {fact.Name}\n";
+            code += $"truncate table [dbo].[{fact.Name}]\n\n";
             code += $"insert into [dbo].[{fact.Name}] (";
             string selectcode = "select ";            
 
