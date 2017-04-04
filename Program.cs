@@ -9,12 +9,23 @@ using Kdv.CeusDL.Generator.Helpers;
 
 namespace ConsoleApplication
 {
+    ///
+    /// Release mit .exe-Datei erzeugen:  dotnet publish -c Release -r win10-x64
+    ///
     public class Program
     {
         public static void Main(string[] args)
         {
+            string path ="";
+
+            if(args.Length > 0) {
+                path = args[0];
+            } else {
+                path = Path.Combine(".", "dsl", "bewerber.ceusdl");
+            }
+
             var parser = new CeusDLParser();
-            var result = parser.ParseFile(Path.Combine(".", "dsl", "bewerber.ceusdl"));
+            var result = parser.ParseFile(path);
 
             if(result == null) {
                 throw new Exception("Parsing-Vorgang mit Fehler abgebrochen ....");

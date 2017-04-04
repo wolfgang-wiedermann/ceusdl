@@ -1,5 +1,7 @@
 bin/Debug
+bin/Release
 obj/Debug
+obj/Release
 obj/ceusdsl.csproj.nuget.g.props
 obj/ceusdsl.csproj.nuget.g.targets
 obj/project.assets.json
