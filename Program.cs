@@ -24,6 +24,11 @@ namespace ConsoleApplication
                 path = Path.Combine(".", "dsl", "bewerber.ceusdl");
             }
 
+            if(!File.Exists(path)) {
+                Console.WriteLine($"FEHLER: Die Datei {path} existiert nicht!");
+                return;
+            }
+
             var parser = new CeusDLParser();
             var result = parser.ParseFile(path);
 
@@ -33,6 +38,18 @@ namespace ConsoleApplication
 
             var ddGenerator = new DemoDataGenerator();
             ddGenerator.GenerateCode(result);
+
+            // Falls die Ausgabeverzeichnisse noch nicht existieren dann anlegen...
+
+            if(!Directory.Exists("GeneratedSQL")) {
+                Directory.CreateDirectory("GeneratedSQL");
+            }
+            if(!Directory.Exists("GeneratedCode")) {
+                Directory.CreateDirectory("GeneratedCode");
+            }
+            if(!Directory.Exists("GeneratedData")) {
+                Directory.CreateDirectory("GeneratedData");
+            }
 
             // Interface Layer
             
