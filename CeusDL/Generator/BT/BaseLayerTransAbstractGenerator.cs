@@ -18,7 +18,7 @@ namespace Kdv.CeusDL.Generator.BT {
             }
         }
 
-        protected object GetTableName(Interface ifa, Config conf)
+        public object GetTableName(Interface ifa, Config conf)
         {
             return $"{blGenerator.GetPrefix(conf)}BT{blGenerator.GetTypeSuffix(ifa)}_{ifa.Name}";
         }
