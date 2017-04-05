@@ -6,6 +6,7 @@ using Kdv.CeusDL.Generator.BL;
 using Kdv.CeusDL.Generator.BT;
 using Kdv.CeusDL.Generator.AL;
 using Kdv.CeusDL.Generator.Helpers;
+using Kdv.CeusDL.Generator.Doc;
 
 namespace ConsoleApplication
 {
@@ -49,6 +50,9 @@ namespace ConsoleApplication
             }
             if(!Directory.Exists("GeneratedData")) {
                 Directory.CreateDirectory("GeneratedData");
+            }
+            if(!Directory.Exists("GeneratedDoc")) {
+                Directory.CreateDirectory("GeneratedDoc");
             }
 
             // Interface Layer
@@ -94,6 +98,14 @@ namespace ConsoleApplication
 
             var alLoadGenerator = new AnalyticalLayerLoadGenerator();
             File.WriteAllText(Path.Combine("GeneratedSQL", "AL_Load.sql"), alLoadGenerator.GenerateCode(result));
+
+            // Dokumentation
+
+            var docGenerator = new DocGenerator();
+            File.WriteAllText(Path.Combine("GeneratedDoc", "doku.html"), docGenerator.GenerateCode(result));
+
+            var dotGenerator = new GraphGenerator();
+            File.WriteAllText(Path.Combine("GeneratedDoc", "doku.dot"), dotGenerator.GenerateCode(result));
 
             Console.WriteLine();
         }
