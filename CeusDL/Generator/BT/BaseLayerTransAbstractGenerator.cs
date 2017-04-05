@@ -21,7 +21,7 @@ namespace Kdv.CeusDL.Generator.BT {
         public object GetTableName(Interface ifa, Config conf)
         {
             if(ifa.Type == InterfaceType.DEF_TABLE) {
-                return blGenerator.GetTableName(ifa, conf);
+                return $"{blGenerator.GetPrefix(conf)}BT_D_{ifa.Name}";
             } else {
                 return $"{blGenerator.GetPrefix(conf)}BT{blGenerator.GetTypeSuffix(ifa)}_{ifa.Name}";
             }

@@ -11,7 +11,7 @@ namespace Kdv.CeusDL.Generator.BT {
             result += GetUseStatement(model);
 
             foreach(var ifa in model.Interfaces) {
-                if(ifa.Type == InterfaceType.DIM_TABLE || ifa.Type == InterfaceType.DIM_VIEW) {
+                if(ifa.Type == InterfaceType.DIM_TABLE || ifa.Type == InterfaceType.DIM_VIEW || ifa.Type == InterfaceType.DEF_TABLE) {
                     result += $"-- Dimmensionstabelle : {ifa.Name} \n";
                     result += GenerateCreateWithChildrenDimTableCode(ifa, model.Config);
                     // TODO: Foreign Keys generieren
