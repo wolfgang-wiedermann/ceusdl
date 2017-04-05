@@ -95,10 +95,25 @@ interface Studienfach : DimView(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");    
-    // TODO: Landes- und Bundesschlüssel
+    ref StudienfachBayern.KNZ;
 }
 
 interface Studienabschluss : DimView(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");    
+}
+
+interface StudienfachBayern : DimView {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
+    ref StudienfachBund.KNZ;  
+}
+
+interface StudienfachBund : DimView {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
@@ -207,7 +222,7 @@ interface HZBArt : DimTable(mandant=true) {
     base AMT_ID:varchar(len="50");
 }
 
-interface HZBNote : DefTable(mandant=true) {
+interface HZBNote : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");    
@@ -217,7 +232,7 @@ interface HZBNote : DefTable(mandant=true) {
 // Sonstige Stamm-Attribute
 //
 
-interface Geschlecht : DefTable(mandant=true) {
+interface Geschlecht : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500"); 
@@ -239,11 +254,10 @@ interface JaNein : DefTable {
 // Fakten-Tabellen
 //
 
-interface Bewerber : FactTable(mandant=true, history=Liefertag) {    
+interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {    
     // Attribute
     base Bewerbernummer:varchar(len="20", primary_key="true");
-    base Liefertag:varchar(len="10", primary_key="true");
-    ref Tag.KNZ;
+    ref Tag.KNZ(primary_key="true");
 
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
@@ -267,12 +281,10 @@ interface Bewerber : FactTable(mandant=true, history=Liefertag) {
     fact HZBNote_F:decimal(len="3,2");
 }
 
-interface Antrag : FactTable(mandant=true, history=Liefertag) {
+interface Antrag : FactTable(mandant=true, history=Tag.KNZ) {
     // Attribute
-    base Antragsnummer:varchar(len="20", primary_key="true");
-    base Liefertag:varchar(len="10", primary_key="true");
-
-    ref Tag.KNZ; 
+    base Antragsnummer:varchar(len="20", primary_key="true");    
+    ref Tag.KNZ(primary_key="true"); 
 
     ref Bewerber.Bewerbernummer;
 
