@@ -1,0 +1,293 @@
+// ------------------------------------
+// Beispiel in CEUS-Definition-Language
+// ------------------------------------
+// 0. Basisdefinitionen
+config {
+     prefix="AP";
+     il_database="FH_AP_InterfaceLayer";
+     bl_database="FH_AP_BaseLayer";
+     bt_database="FH_AP_BaseLayer";
+     al_database="FH_AP_Warehouse";
+}
+
+// 1. Interface Definitionen
+
+//
+// Zeit-Attribute
+//
+
+interface Semester : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface FachSemester : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface HochschulSemester : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface Tag : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Woche.KNZ;    
+    ref Monat.KNZ;
+}
+
+interface Woche : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Jahr.KNZ;
+}
+
+interface Monat : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Jahr.KNZ;
+}
+
+interface Jahr : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+//
+// Studiengangsattribute
+//
+
+// Sollte nicht DimTable sondern DimTable heißen...
+interface StudiengangHisInOne : DimTable(mandant=true) {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref StudiengangSOSPOS.KNZ;
+    ref Studientyp.KNZ;
+}
+
+interface Studientyp : DimTable(mandant=true) {
+    // Standard-Attributfelder
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface StudiengangSOSPOS : DimView(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    ref Studienfach.KNZ;
+    ref Studienabschluss.KNZ;    
+}
+
+interface Studienfach : DimView(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+    // TODO: Landes- und Bundesschlüssel
+}
+
+interface Studienabschluss : DimView(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");    
+}
+
+//
+// Status-Attribute
+// 
+
+// requestsubject_status
+interface Antragsfachstatus : DimTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base HISKEY_ID:varchar(len="50");
+}
+
+// request_status
+interface Bewerberstatus : DimTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base HISKEY_ID:varchar(len="50");
+}
+
+// Zulassung Ja-Nein
+interface Zulassung : DimTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base HISKEY_ID:varchar(len="50");
+}
+
+// Hauptverfahren, Nachrückverfahren etc. Phasen von DoSV???
+interface Zulassungsart : DimTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base HISKEY_ID:varchar(len="50");  
+}
+
+interface Zulassungsquote : DimTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+}
+
+//
+// Herkunft - GeoAttribute
+//
+
+interface Kontinent : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");    
+}
+
+interface Land : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500"); 
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");
+    ref Kontinent.KNZ;   
+}
+
+interface Bundesland : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");    
+    ref Land.KNZ;
+}
+
+interface Regierungsbezirk : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");
+    ref Bundesland.KNZ;
+}
+
+interface Kreis : DimTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");
+    ref Bundesland.KNZ;
+    ref Regierungsbezirk.KNZ;
+}
+
+//
+// HZB-Attribute
+//
+
+interface HZBArt : DimTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
+}
+
+interface HZBNote : DefTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+}
+
+//
+// Sonstige Stamm-Attribute
+//
+
+interface Geschlecht : DefTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500"); 
+}
+
+interface Wartehalbjahre : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500"); 
+}
+
+interface JaNein : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500"); 
+}
+
+//
+// Fakten-Tabellen
+//
+
+interface Bewerber : FactTable(mandant=true, history=Liefertag) {    
+    // Attribute
+    base Bewerbernummer:varchar(len="20", primary_key="true");
+    base Liefertag:varchar(len="10", primary_key="true");
+    ref Tag.KNZ;
+
+    ref Geschlecht.KNZ;
+    ref Tag.KNZ as Geburtstag;
+
+    ref Semester.KNZ;
+
+    ref HZBArt.KNZ;
+    ref HZBNote.KNZ;
+    ref Jahr.KNZ as HZBJahr; // HZB_Jahr
+
+    ref Kreis.KNZ as HZBKreis; // HZB_Kreis
+    ref Kreis.KNZ as Heimatort;
+    ref Land.KNZ as Staatsangehoerigkeit;    
+
+    ref Bewerberstatus.KNZ;
+
+    ref JaNein.KNZ as DoSVBewerber; // DoSVBewerber_JaNein
+
+    // Fakten
+    fact Anzahl_F:decimal(len="1,0"); // ein default="1" wäre hier noch nett
+    fact HZBNote_F:decimal(len="3,2");
+}
+
+interface Antrag : FactTable(mandant=true, history=Liefertag) {
+    // Attribute
+    base Antragsnummer:varchar(len="20", primary_key="true");
+    base Liefertag:varchar(len="10", primary_key="true");
+
+    ref Tag.KNZ; 
+
+    ref Bewerber.Bewerbernummer;
+
+    ref StudiengangHisInOne.KNZ;
+    ref Antragsfachstatus.KNZ;
+    ref Zulassung.KNZ;
+    ref Zulassungsart.KNZ;
+    ref Zulassungsquote.KNZ;
+    ref HochschulSemester.KNZ;
+    ref FachSemester.KNZ;
+    ref Wartehalbjahre.KNZ;
+
+    ref JaNein.KNZ as DoSVBewerbung; // DoSVBewerbung_JaNein
+
+    // Fakten
+    fact Anzahl_F:decimal(len="1,0"); // ein default="1" wäre hier noch nett
+    fact Wartehalbjahre_F:int;
+}
