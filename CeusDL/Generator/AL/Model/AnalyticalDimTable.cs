@@ -22,7 +22,7 @@ namespace Kdv.CeusDL.Generator.AL {
             Add(new DerivedInterfaceBasicAttribute() {
                 Name=$"{GetAlias()}{baseTable.Name}_ID",
                 DataType=InterfaceAttributeDataType.INT,
-                PrimaryKey=false,
+                PrimaryKey=true,
                 ParentInterface=baseTable,
                 BaseAttribute= new InterfaceBasicAttribute() {
                     Name=$"ID",
@@ -50,7 +50,7 @@ namespace Kdv.CeusDL.Generator.AL {
                 Add(new DerivedInterfaceBasicAttribute() {
                     Name=$"{GetAlias()}{baseTable.Name}_{basic.Name}",
                     DataType=basic.DataType,
-                    PrimaryKey=basic.PrimaryKey,
+                    PrimaryKey=false,
                     ParentInterface=basic.ParentInterface,
                     Length=basic.Length,
                     Decimals=basic.Decimals, 
@@ -94,7 +94,7 @@ namespace Kdv.CeusDL.Generator.AL {
                     Add(new DerivedInterfaceBasicAttribute() {
                         Name=$"{GetAlias()}{baseTable.Name}_{basic.Name}",
                         DataType=basic.DataType,
-                        PrimaryKey=basic.PrimaryKey,
+                        PrimaryKey=false,
                         ParentInterface=basic.ParentInterface,
                         Length=basic.Length,
                         Decimals=basic.Decimals, 
