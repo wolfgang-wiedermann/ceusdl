@@ -176,7 +176,15 @@ namespace Kdv.CeusDL.Generator.BT {
                     } else if(r.ReferencedAttribute.ParentInterface.IsMandantInterface()) {
                         code += $"b.Mandant_KNZ = a{i}.Mandant_KNZ\n    and ";
                     }                
-                    code += $"b.{blGenerator.GetAttributeName(attr)} = a{i}.{blGenerator.GetAttributeName(r.ReferencedAttribute)}\n";                    
+                    code += $"b.{blGenerator.GetAttributeName(attr)} = a{i}.{blGenerator.GetAttributeName(r.ReferencedAttribute)}\n";
+
+                    // Bei verknüpfung historisierter Faktentabellen das historienattribut mit einbeziehen...
+                    if(r.ReferencedAttribute.ParentInterface.Type == InterfaceType.FACT_TABLE
+                        && r.ReferencedAttribute.ParentInterface.IsHistorizedInterface()
+                        && ifa.IsHistorizedInterface()) {
+                            var parent = r.ReferencedAttribute.ParentInterface;
+                            code += $"    and b.{blGenerator.GetAttributeName(parent.GetHistoryAttribute())} = a{i}.{blGenerator.GetAttributeName(ifa.GetHistoryAttribute())}\n";
+                    }               
                     i++;
                 }                
             }

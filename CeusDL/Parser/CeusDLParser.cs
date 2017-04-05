@@ -107,6 +107,15 @@ namespace Kdv.CeusDL.Parser
                     case IN_CONFIG_PARAM_STRING:
                         onInConfigParamString(i, code);
                         break;
+                    case IN_INTERFACE_REFATTR_PARAM_LIST:
+                        onInInterfaceRefattrParamList(i, code);
+                        break;
+                    case IN_INTERFACE_REFATTR_PARAM_PK:
+                        onInInterfaceRefattrParamPk(i, code);
+                        break;                        
+                    case IN_INTERFACE_REFATTR_PARAM_PK_VALUE:
+                        onInInterfaceRefattrParamPkValue(i, code);
+                        break;
                     default:
                         Console.WriteLine($"Reached unhandled State {state}");
                         return null;
@@ -512,6 +521,11 @@ namespace Kdv.CeusDL.Parser
                 this.state = BEFORE_INTERFACE_ATTRIBUTE_ALIAS;
                 this.currentInterfaceAttribute.ReferencedField = buf;
                 buf = "";
+            } else if(c == '(') {
+                Log($"ReferencedFld: {buf}");
+                this.state = IN_INTERFACE_REFATTR_PARAM_LIST;
+                this.currentInterfaceAttribute.ReferencedField = buf;
+                buf = "";
             } else {
                 throw new InvalidCharacterException(c);
             }
@@ -519,9 +533,12 @@ namespace Kdv.CeusDL.Parser
 
         private void onBeforeInterfaceAttributeAlias(int pos, string code) {
             char c = code[pos];
-            if(c == 'a' || c == 's') {
-                buf += c;
-            } else if(buf.Equals(buf) && IsWhitespaceChar(c)) {
+            if(c == '(') {                
+                this.state = IN_INTERFACE_REFATTR_PARAM_LIST;                
+                buf = "";
+            } else if(c == 'a' || c == 's') {
+                buf += c;                
+            } else if("as".Equals(buf) && IsWhitespaceChar(c)) {
                 buf = "";
                 this.state = IN_INTERFACE_ATTRIBUTE_ALIAS;
             } else if(buf.Length == 0 && IsWhitespaceChar(c)) {
@@ -541,6 +558,55 @@ namespace Kdv.CeusDL.Parser
             } else if(IsValidObjectNameChar(c)) {
                 buf += c;
             } else if (!(IsWhitespaceChar(c) && buf.Length == 0)){
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceRefattrParamList(int pos, string code) {
+            char c = code[pos];
+            if(c == '=') {
+                switch(buf) {
+                    case "primary_key":
+                        buf = "";
+                        this.state = IN_INTERFACE_REFATTR_PARAM_PK;
+                        break;
+                    default:
+                        throw new InvalidTokenException(buf);
+                }
+            } else if(c == ')') {
+                buf = "";
+                this.state = BEHIND_INTERFACE_PARAM_LIST;
+            } else if(IsValidObjectNameChar(c)) {
+                buf += c;
+            } else if(!IsWhitespaceChar(c)) {
+                buf = "";
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceRefattrParamPk(int pos, string code) {
+            char c = code[pos];
+            if(c == ',') {
+                this.state = IN_INTERFACE_REFATTR_PARAM_LIST;
+            } else if(c == ')') {
+                this.state = BEHIND_INTERFACE_PARAM_LIST;
+            } else if(c == '"') {
+                this.state = IN_INTERFACE_REFATTR_PARAM_PK_VALUE;
+            } else if(!IsWhitespaceChar(c)) {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceRefattrParamPkValue(int pos, string code) {
+            char c = code[pos];
+            if(c == '"' && buf.Length > 0) {
+                Log($"Primary Key  : {buf}");
+                this.state = IN_INTERFACE_REFATTR_PARAM_PK;
+                this.currentInterfaceAttribute.PrimaryKey = buf;
+                buf = "";
+            } else if(IsValidLetter(c)) {
+                buf += c;
+            } else {
                 throw new InvalidCharacterException(c);
             }
         }
