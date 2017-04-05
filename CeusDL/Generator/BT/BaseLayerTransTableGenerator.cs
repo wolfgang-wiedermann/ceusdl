@@ -53,13 +53,17 @@ namespace Kdv.CeusDL.Generator.BT {
                 code += ",\n    T_Gueltig_Bis int not null";
             }*/
 
-            code += ",\n    T_Modifikation varchar(10) not null";
-            code += ",\n    T_Bemerkung varchar(100)";
+            if(ifa.Type != InterfaceType.DEF_TABLE) {
+                code += ",\n    T_Modifikation varchar(10) not null";
+                code += ",\n    T_Bemerkung varchar(100)";
+            }
             code += ",\n    T_Benutzer varchar(100) not null";
             code += ",\n    T_System varchar(10) not null";
             code += ",\n    T_Erst_DAT datetime not null";
             code += ",\n    T_Aend_DAT datetime not null";
-            code += ",\n    T_Ladelauf_NR int not null";
+            if(ifa.Type != InterfaceType.DEF_TABLE) {
+                code += ",\n    T_Ladelauf_NR int not null";
+            }
 
             code += "\n);\n\n";
             return code;
