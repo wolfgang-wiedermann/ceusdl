@@ -37,6 +37,10 @@ namespace Kdv.CeusDL.Generator.AL {
                     } else {
                         code += $",\n    {basic.Name} {GetColumnType(field)}";
                     }
+
+                    if(field.PrimaryKey) {
+                        code += " not null primary key";
+                    }
                 }   
             }
             code += "\n)\n\n";

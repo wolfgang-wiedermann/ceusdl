@@ -11,7 +11,7 @@ namespace Kdv.CeusDL.Generator.BT {
             result += GetUseStatement(model);
 
             foreach(var ifa in model.Interfaces) {
-                if(ifa.Type == InterfaceType.DIM_TABLE || ifa.Type == InterfaceType.DIM_VIEW) {
+                if(ifa.Type == InterfaceType.DIM_TABLE || ifa.Type == InterfaceType.DIM_VIEW || ifa.Type == InterfaceType.DEF_TABLE) {
                     result += $"-- Dimmensionstabelle : {ifa.Name} \n";
                     result += GenerateCreateWithChildrenDimTableCode(ifa, model.Config);
                     // TODO: Foreign Keys generieren
@@ -53,13 +53,17 @@ namespace Kdv.CeusDL.Generator.BT {
                 code += ",\n    T_Gueltig_Bis int not null";
             }*/
 
-            code += ",\n    T_Modifikation varchar(10) not null";
-            code += ",\n    T_Bemerkung varchar(100)";
+            if(ifa.Type != InterfaceType.DEF_TABLE) {
+                code += ",\n    T_Modifikation varchar(10) not null";
+                code += ",\n    T_Bemerkung varchar(100)";
+            }
             code += ",\n    T_Benutzer varchar(100) not null";
             code += ",\n    T_System varchar(10) not null";
             code += ",\n    T_Erst_DAT datetime not null";
             code += ",\n    T_Aend_DAT datetime not null";
-            code += ",\n    T_Ladelauf_NR int not null";
+            if(ifa.Type != InterfaceType.DEF_TABLE) {
+                code += ",\n    T_Ladelauf_NR int not null";
+            }
 
             code += "\n);\n\n";
             return code;

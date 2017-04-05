@@ -89,6 +89,13 @@ namespace Kdv.CeusDL.Parser {
         private InterfaceRefAttribute ToInterfaceRefAttribute(TmpInterfaceAttribute input) {
             var attr = new InterfaceRefAttribute(input.ForeignInterface, input.ReferencedField);
             attr.Alias = input.As;
+            
+            if(input.PrimaryKey == "true") {
+                attr.PrimaryKey = true;
+            } else {
+                attr.PrimaryKey = false;
+            }
+
             return attr;
         }
 

@@ -61,7 +61,7 @@ namespace Kdv.CeusDL.Generator.BT {
         public override string GenerateCode(ParserResult model) {
               string code = "-- BT Load Skript \n\n";
               code += GetUseStatement(model);
-              foreach(var ifa in model.Interfaces.Where(i => i.Type != InterfaceType.DEF_TABLE )) {
+              foreach(var ifa in model.Interfaces) {
                     code += GetTruncateStatement(ifa, model.Config);
                     code += GetLoadStatement(ifa, model);
               }
@@ -113,13 +113,19 @@ namespace Kdv.CeusDL.Generator.BT {
 
 //            if(ifa.IsHistorizedInterface()) TODO: ggf. noch nötig ...
 
-            code += ",\n    T_Modifikation";
-            code += ",\n    T_Bemerkung";
+            // Für Def-Tables nicht relevante Felder ausschließen
+            if(ifa.Type != InterfaceType.DEF_TABLE) {
+                code += ",\n    T_Modifikation";
+                code += ",\n    T_Bemerkung";
+            }
             code += ",\n    T_Benutzer";
             code += ",\n    T_System";
             code += ",\n    T_Erst_DAT";
             code += ",\n    T_Aend_DAT";
-            code += ",\n    T_Ladelauf_NR";
+            // Für Def-Tables nicht relevante Felder ausschließen
+            if(ifa.Type != InterfaceType.DEF_TABLE) {
+                code += ",\n    T_Ladelauf_NR";
+            }
             return code;
         }
 
@@ -149,13 +155,19 @@ namespace Kdv.CeusDL.Generator.BT {
                   code += ",\n    cast(b.Mandant_KNZ as int) as Mandant_ID";
             }
 
-            code += ",\n    b.T_Modifikation";
-            code += ",\n    b.T_Bemerkung";
+            // Für Def-Tables nicht relevante Felder ausschließen
+            if(ifa.Type != InterfaceType.DEF_TABLE) {
+                code += ",\n    b.T_Modifikation";
+                code += ",\n    b.T_Bemerkung";
+            }
             code += ",\n    b.T_Benutzer";
             code += ",\n    b.T_System";
             code += ",\n    b.T_Erst_DAT";
             code += ",\n    GetDate()";
-            code += ",\n    b.T_Ladelauf_NR";
+            // Für Def-Tables nicht relevante Felder ausschließen
+            if(ifa.Type != InterfaceType.DEF_TABLE) {
+                code += ",\n    b.T_Ladelauf_NR";
+            }
             return code;
         }
 
@@ -176,7 +188,15 @@ namespace Kdv.CeusDL.Generator.BT {
                     } else if(r.ReferencedAttribute.ParentInterface.IsMandantInterface()) {
                         code += $"b.Mandant_KNZ = a{i}.Mandant_KNZ\n    and ";
                     }                
-                    code += $"b.{blGenerator.GetAttributeName(attr)} = a{i}.{blGenerator.GetAttributeName(r.ReferencedAttribute)}\n";                    
+                    code += $"b.{blGenerator.GetAttributeName(attr)} = a{i}.{blGenerator.GetAttributeName(r.ReferencedAttribute)}\n";
+
+                    // Bei verknüpfung historisierter Faktentabellen das historienattribut mit einbeziehen...
+                    if(r.ReferencedAttribute.ParentInterface.Type == InterfaceType.FACT_TABLE
+                        && r.ReferencedAttribute.ParentInterface.IsHistorizedInterface()
+                        && ifa.IsHistorizedInterface()) {
+                            var parent = r.ReferencedAttribute.ParentInterface;
+                            code += $"    and b.{blGenerator.GetAttributeName(parent.GetHistoryAttribute())} = a{i}.{blGenerator.GetAttributeName(ifa.GetHistoryAttribute())}\n";
+                    }               
                     i++;
                 }                
             }
