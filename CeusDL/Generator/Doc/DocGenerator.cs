@@ -9,23 +9,31 @@ namespace Kdv.CeusDL.Generator.Doc {
         public string GenerateCode(ParserResult model)
         {
             string code = "<h2>Faktentabellen</h2><div style=\"float:none;\">";
+            int z = 0; 
             foreach(var table in model.Interfaces.Where(i => i.Type == InterfaceType.FACT_TABLE)) {
                 code += GenerateInterfaceDoc(table, model);
+                code += InsertBreak(++z);
             }
 
+            z = 0;
             code += "<div style=\"clear:both;\"></div></div><h2>Dimensionstabellen</h2><div style=\"float:none;\">";
             foreach(var table in model.Interfaces.Where(i => i.Type == InterfaceType.DIM_TABLE)) {
                 code += GenerateInterfaceDoc(table, model);
+                code += InsertBreak(++z);
             }
 
+            z = 0;
             code += "<div style=\"clear:both;\"></div></div><h2>Dimensionsviews</h2><div style=\"float:none;\">";
             foreach(var table in model.Interfaces.Where(i => i.Type == InterfaceType.DIM_VIEW)) {
                 code += GenerateInterfaceDoc(table, model);
+                code += InsertBreak(++z);
             }
 
+            z = 0;
             code += "<div style=\"clear:both;\"></div></div><h2>Defintionstabellen</h2><div style=\"float:none;\">";
             foreach(var table in model.Interfaces.Where(i => i.Type == InterfaceType.DEF_TABLE)) {
                 code += GenerateInterfaceDoc(table, model);
+                code += InsertBreak(++z);
             }
             code += "<div style=\"clear:both;\"></div></div>";
 
@@ -33,8 +41,7 @@ namespace Kdv.CeusDL.Generator.Doc {
         }
 
         public string GenerateInterfaceDoc(Interface table, ParserResult model) {
-            string code = $"<h3>{table.Name}</h3>";
-            string placeholder = "<div style=\"width:10px;float:left;\">&nbsp;</div>";
+            string code = $"<h3>{table.Name}</h3>";            
 
             code += $"<b>Basis-Attribute</b><br/><ul>";
             foreach(var attr in table.Attributes.Where(a => a is InterfaceBasicAttribute)) {
@@ -55,7 +62,17 @@ namespace Kdv.CeusDL.Generator.Doc {
             }
             code += "</ul>";
 
-            return $"<div style=\"border-width:1px;border-style:solid;border-color:black;width:400px;float:left;\">{code}</div>{placeholder}";
+            return $"<div style=\"border-width:1px;border-style:solid;border-color:black;width:400px;float:left;\">{code}</div>";
         }
+
+        private string InsertBreak(int v)
+        {
+            if(v % 2 == 0) {
+                return "<div style=\"clear:both;\"></div><br/>";
+            } else {
+                return "<div style=\"width:10px;float:left;\">&nbsp;</div>";
+            }
+        }
+
     }
 }
