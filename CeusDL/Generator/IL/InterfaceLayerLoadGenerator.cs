@@ -16,8 +16,9 @@ namespace Kdv.CeusDL.Generator.IL {
         public const string FOLDER = "GeneratedCode";
 
         public override string GenerateCode(ParserResult model)
-        {
+        {            
             CreateLoadCsvClasses(model);
+            CreateLoadCsvInterface();
             return GetDeleteStatements(model);
         }
 
@@ -39,6 +40,34 @@ namespace Kdv.CeusDL.Generator.IL {
             return code;
         }
 
+        private void CreateLoadCsvInterface() {
+            string ifaFilename = Path.Combine(FOLDER, "IInterfacelayerLoader.cs");
+            if(!Directory.Exists(FOLDER)) {
+                Directory.CreateDirectory(FOLDER);
+            } else if(File.Exists(ifaFilename)) {
+                File.Delete(ifaFilename);                
+            }
+
+            string code = "using System.Data.Common;\n\n";
+            
+            code += "namespace Kdv.Loader {\n";
+            code += "    public interface IInterfacelayerLoader {\n";
+            code += "        void Execute(DbConnection con);\n";
+            code += "    }\n";
+            code += "}\n";
+
+            File.WriteAllText(ifaFilename, code);
+        }
+
+        private static string GetDeleteStatement(Interface ifa, ParserResult model)
+        {
+            string code = "";
+            if(ifa.Type != InterfaceType.DIM_VIEW && ifa.Type != InterfaceType.DEF_TABLE) {
+                code += $"truncate table {GetILDatabase(model)}.dbo.{GetPrefix(model.Config)}IL_{ifa.Name}";
+            }
+            return code;
+        }
+
         public void CreateLoadCsvClasses(ParserResult model) {
             if(!Directory.Exists(FOLDER)) {
                 Directory.CreateDirectory(FOLDER);
@@ -56,7 +85,11 @@ namespace Kdv.CeusDL.Generator.IL {
 
         private string CreateLoadCsvClass(Interface ifa, ParserResult model)
         {
-            string code ="using System;\nusing System.Collections.Generic;\nusing System.IO;\nusing System.Data.Common;\n\nnamespace Kdv.Loader";
+            string code ="using System;\nusing System.Collections.Generic;\nusing System.IO;\nusing System.Data.Common;\n";
+            if(model.Config.HasValueFor(ConfigItemEnum.PREFIX)) {
+                code += "using Kdv.Loader;\n";
+            }            
+            code += "\nnamespace Kdv.Loader";
             if(model.Config.HasValueFor(ConfigItemEnum.PREFIX)) {
                 code += $".{model.Config.GetValue(ConfigItemEnum.PREFIX)}";
             }
@@ -85,9 +118,8 @@ namespace Kdv.CeusDL.Generator.IL {
             code += $"    public enum {ifa.Name}ParserSubstate ";
             code += "{\n        INITIAL, INSTRING\n    }\n\n";
 
-            // Parser- und Datenklasse generieren
-            code += $"    public class {ifa.Name}Loader "+"{\n";
-            
+            // Datenklasse generieren
+            code += $"    public class {ifa.Name}Line "+"{\n";            
             // Attribute
             if(ifa.IsMandantInterface()) {
                 code += "        public string Mandant_KNZ { get; set; }\n";
@@ -95,15 +127,33 @@ namespace Kdv.CeusDL.Generator.IL {
             foreach(var attr in ifa.Attributes) {
                 code += CreateCSAttribute(attr, ifa);
             }
+            code += "    }\n\n";
+
+            // Parserklasse generieren
+            code += $"    public class {ifa.Name}Loader : IInterfacelayerLoader "+"{\n";
+            code += "        public string Folder { get; set; }\n";
+            code += "        public string Filename { get; set; }\n\n";
+
+            code += $"        public {ifa.Name}Loader(string folder) {{\n";
+            code += $"            this.Filename = \"{ifa.Name}.csv\";\n";
+            code +=  "            this.Folder = folder;\n";
+            code +=  "        }\n\n";
 
             // Ausführen der Übertragung in die Datenbank
-            code += "        public static void Execute(string filename, DbConnection con) {\n";
+            code += "\n";
+            code += "        public void Execute(DbConnection con) {\n";
+            code += "            string filename = Path.Combine(this.Folder, this.Filename);\n";
             code += "            if(con == null) {\n";
             code += "                // Für Debug-Zwecke Ausgabe ...\n";
             code += "                foreach(var line in Load(filename)) {\n";
             code += "                    Console.WriteLine(GetInsertSQL(line));\n";
             code += "                }\n";
             code += "            } else {\n";
+            // TODO: Prüfen ob das if hier nicht überflüssig ist!
+            if(ifa.Type != InterfaceType.DIM_VIEW && ifa.Type != InterfaceType.DEF_TABLE) {
+                code += "                // Tabelleninhalt löschen\n";
+                code += "                DeleteFromTable(con);\n";
+            }
             code += "                int i = 0;\n";
             code += "                // Tatsächliche Verarbeitung: 1. Zeile wird als Kopfzeile ausgelassen.\n";
             code += "                using(var cmd = con.CreateCommand()) {\n";
@@ -119,7 +169,7 @@ namespace Kdv.CeusDL.Generator.IL {
             code += "        }\n";            
 
             // Laden der Datei
-            code += $"\n        public static IEnumerable<{ifa.Name}Loader> Load(string filename)"+" {\n";
+            code += $"\n        public IEnumerable<{ifa.Name}Line> Load(string filename)"+" {\n";
             code += "            if(!File.Exists(filename)) {\n";
             code += "                throw new FileNotFoundException(filename);\n";
             code += "            }\n\n";
@@ -132,7 +182,7 @@ namespace Kdv.CeusDL.Generator.IL {
             code += "        }\n\n";
 
             // Insert-SQL-Statement generieren
-            code += $"        internal static string GetInsertSQL({ifa.Name}Loader line) {{\n";
+            code += $"        internal string GetInsertSQL({ifa.Name}Line line) {{\n";
             code += $"            string sql = \"insert into {GetILDatabase(model)}.dbo.{GetPrefix(model.Config)}IL_{ifa.Name} values (\";\n";
             
             if(ifa.IsMandantInterface()) {
@@ -154,14 +204,14 @@ namespace Kdv.CeusDL.Generator.IL {
             code += "        }\n\n";
 
             // Parser-Funktion
-            code += $"        internal static {ifa.Name}Loader ParseLine(string line) "+"{\n";
+            code += $"        internal {ifa.Name}Line ParseLine(string line) "+"{\n";
             if(ifa.IsMandantInterface()) {
                 code += $"            {ifa.Name}ParserState state = {ifa.Name}ParserState.IN_MANDANT_KNZ;\n";
             } else {
                 code += $"            {ifa.Name}ParserState state = {ifa.Name}ParserState.IN_{GetCSAttributeName(ifa.Attributes[0], ifa).ToUpper()};\n";
             }
             code += $"            {ifa.Name}ParserSubstate substate = {ifa.Name}ParserSubstate.INITIAL;\n";
-            code += $"            {ifa.Name}Loader content = new {ifa.Name}Loader();\n";           
+            code += $"            {ifa.Name}Line content = new {ifa.Name}Line();\n";                    
             code += "            char c = ' ';\n";
             code += "            string buf = \"\";\n\n";
             code += "            for(int i = 0; i < line.Length; i++) {\n";
@@ -221,6 +271,16 @@ namespace Kdv.CeusDL.Generator.IL {
             code += "            }\n";
             code += "            return content;\n";
             code += "        }\n\n";
+
+            // Funktion DeleteFromTable aufbauen
+            if(ifa.Type != InterfaceType.DIM_VIEW && ifa.Type != InterfaceType.DEF_TABLE) {
+            code += "        public void DeleteFromTable(DbConnection con) {\n";
+            code += "            using(var cmd = con.CreateCommand()) {\n";
+            code += $"                cmd.CommandText = \"{GetDeleteStatement(ifa, model)}\";\n";
+            code += "                cmd.ExecuteNonQuery();\n";
+            code += "            }\n";                
+            code += "        }\n";
+            }
 
             // Klasse und Namespace abschließen
             code += "    }\n";

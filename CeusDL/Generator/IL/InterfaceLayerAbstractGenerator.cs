@@ -24,7 +24,7 @@ namespace Kdv.CeusDL.Generator.IL {
         ///
         /// Falls in config-Sektion enthalten, Prefix liefern, ansonsten leerstring
         ///
-        protected string GetPrefix(Config conf) {
+        protected static string GetPrefix(Config conf) {
             if(conf.HasValueFor(ConfigItemEnum.PREFIX)) {
                 return $"{conf.GetValue(ConfigItemEnum.PREFIX)}_";                
             } else {
@@ -32,7 +32,7 @@ namespace Kdv.CeusDL.Generator.IL {
             }
         }
 
-        public string GetILDatabase(ParserResult model) {
+        public static string GetILDatabase(ParserResult model) {
             if(model.Config.HasValueFor(ConfigItemEnum.IL_DATABASE)) {
                 return model.Config.GetValue(ConfigItemEnum.IL_DATABASE);
             } else {
@@ -48,7 +48,8 @@ namespace Kdv.CeusDL.Generator.IL {
             } else if (attr is InterfaceRefAttribute) {
                 var refer = (InterfaceRefAttribute)attr;
                 if(string.IsNullOrEmpty(refer.Alias)) {
-                    code += $"{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";                    } else {
+                    code += $"{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
+                } else {
                     code += $"{refer.Alias}_{refer.ReferencedAttribute.ParentInterface.Name}_{refer.ReferencedAttribute.Name} ";
                 }                
             }
