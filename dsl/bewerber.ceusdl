@@ -166,7 +166,7 @@ interface Zulassungsquote : DimTable(mandant=true) {
 // Herkunft - GeoAttribute
 //
 
-interface Kontinent : DimTable {
+interface Kontinent : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
@@ -174,7 +174,7 @@ interface Kontinent : DimTable {
     base Breitengrad:varchar(len="50");    
 }
 
-interface Land : DimTable {
+interface Land : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500"); 
@@ -183,7 +183,7 @@ interface Land : DimTable {
     ref Kontinent.KNZ;   
 }
 
-interface Bundesland : DimTable {
+interface Bundesland : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
@@ -192,7 +192,7 @@ interface Bundesland : DimTable {
     ref Land.KNZ;
 }
 
-interface Regierungsbezirk : DimTable {
+interface Regierungsbezirk : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");    
@@ -201,7 +201,7 @@ interface Regierungsbezirk : DimTable {
     ref Bundesland.KNZ;
 }
 
-interface Kreis : DimTable {
+interface Kreis : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
