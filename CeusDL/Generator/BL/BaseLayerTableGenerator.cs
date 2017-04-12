@@ -25,6 +25,7 @@ namespace Kdv.CeusDL.Generator.BL {
                     code += "*/\n";
                 } else if(obj.Type == InterfaceType.FACT_TABLE) {                    
                     code += GenerateCreateFactTableCode(obj, model);
+                    code += GenerateUniqueConstraint(obj, model.Config);
                 } else if(obj.Type == InterfaceType.DEF_TABLE) {                    
                     code += GenerateCreateDefTableCode(obj, model.Config);
                     code += GenerateUniqueConstraint(obj, model.Config);
@@ -144,9 +145,7 @@ namespace Kdv.CeusDL.Generator.BL {
             }
 
             // Offizielle Primärschlüssel-Attribute ermitteln
-            var list = ifa.Attributes.Where(a => a is InterfaceBasicAttribute)
-                                     .Select(a => (InterfaceBasicAttribute)a)
-                                     .Where(a => a.PrimaryKey);            
+            var list = ifa.Attributes.Where(a => a.PrimaryKey);            
 
             foreach(var attr in list) {                
                 if(i > 0) {
@@ -156,7 +155,7 @@ namespace Kdv.CeusDL.Generator.BL {
                 i++;
             }
 
-            if(ifa.IsHistorizedInterface()) {
+            if(ifa.IsHistorizedInterface() && ifa.Type != InterfaceType.FACT_TABLE) {
                 code += ",\n    [T_Gueltig_Von] ASC";   
             }
 

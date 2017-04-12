@@ -48,7 +48,7 @@ namespace Kdv.CeusDL.Generator.BL {
             }            
 
             code += ",\n    T_Modifikation, T_Ladelauf_NR, T_Benutzer, T_System, T_Erst_DAT, T_Aend_DAT, T_Bemerkung";
-            code += "\n)\nselect\n";            
+            code += "\n)\nselect distinct\n";            
 
             if(ifa.IsMandantInterface()) {
                 code += "    Mandant_KNZ";
