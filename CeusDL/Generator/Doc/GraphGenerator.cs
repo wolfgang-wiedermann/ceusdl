@@ -43,6 +43,8 @@ namespace Kdv.CeusDL.Generator.Doc {
                 return ", label=\"{&lt;&lt; Fakt &gt;&gt;|"+table.Name+"}\"";
             } else if(table.Type == InterfaceType.DEF_TABLE) {
                 return ", label=\"{&lt;&lt; Konstante &gt;&gt;|"+table.Name+"}\"";
+            } else if(table.Type == InterfaceType.DIM_VIEW) {
+                return ", label=\"{&lt;&lt; View &gt;&gt;|"+table.Name+"}\"";
             }
             return "";
         }
