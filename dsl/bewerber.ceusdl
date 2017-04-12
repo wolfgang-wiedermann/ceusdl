@@ -72,11 +72,15 @@ interface StudiengangHisInOne : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
+    // Beziehungen
     ref StudiengangSOSPOS.KNZ;
     ref Studientyp.KNZ;
+    // Zusätzliche Attributfelder
+    // z. B. Kapazität, Überbuchung, etc. 
+    // (erfordert zusätzliche Custom-Tabelle)
 }
 
-interface Studientyp : DimTable(mandant=true) {
+interface Studientyp : DefTable {
     // Standard-Attributfelder
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
@@ -134,14 +138,6 @@ interface Antragsfachstatus : DimTable(mandant=true) {
 
 // request_status
 interface Bewerberstatus : DimTable(mandant=true) {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");
-    base HISKEY_ID:varchar(len="50");
-}
-
-// Zulassung Ja-Nein
-interface Zulassung : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
@@ -211,6 +207,16 @@ interface Kreis : DimTable(mandant=true) {
     ref Regierungsbezirk.KNZ;
 }
 
+interface Ort : DimTable(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+    base Postleitzahl:varchar(len="5");
+    base Laengengrad:varchar(len="50");
+    base Breitengrad:varchar(len="50");
+    ref Kreis.KNZ;
+}
+
 //
 // HZB-Attribute
 //
@@ -220,9 +226,30 @@ interface HZBArt : DimTable(mandant=true) {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     base AMT_ID:varchar(len="50");
+    ref HZBTyp.KNZ;
+    ref HZBSchulart.KNZ;    
+}
+
+interface HZBTyp : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
+}
+
+interface HZBSchulart : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
 }
 
 interface HZBNote : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
+    ref Notenstufe.KNZ;
+}
+
+interface Notenstufe : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");    
@@ -259,6 +286,8 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
     base Bewerbernummer:varchar(len="20", primary_key="true");
     ref Tag.KNZ(primary_key="true");
 
+    base DoSV_BID:varchar(len="100"); // BID aus DoSV ???
+    
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
 
@@ -269,7 +298,7 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
     ref Jahr.KNZ as HZBJahr; // HZB_Jahr
 
     ref Kreis.KNZ as HZBKreis; // HZB_Kreis
-    ref Kreis.KNZ as Heimatort;
+    ref Ort.KNZ as Heimat; // Heimatort
     ref Land.KNZ as Staatsangehoerigkeit;    
 
     ref Bewerberstatus.KNZ;
@@ -290,7 +319,7 @@ interface Antrag : FactTable(mandant=true, history=Tag.KNZ) {
 
     ref StudiengangHisInOne.KNZ;
     ref Antragsfachstatus.KNZ;
-    ref Zulassung.KNZ;
+    ref JaNein.KNZ as Zulassung; // Zulassung_JaNein
     ref Zulassungsart.KNZ;
     ref Zulassungsquote.KNZ;
     ref HochschulSemester.KNZ;
