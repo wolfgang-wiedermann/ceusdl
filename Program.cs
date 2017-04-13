@@ -7,6 +7,7 @@ using Kdv.CeusDL.Generator.BT;
 using Kdv.CeusDL.Generator.AL;
 using Kdv.CeusDL.Generator.Helpers;
 using Kdv.CeusDL.Generator.Doc;
+using Kdv.CeusDL.Utils;
 
 namespace ConsoleApplication
 {
@@ -106,6 +107,11 @@ namespace ConsoleApplication
 
             var dotGenerator = new GraphGenerator();
             File.WriteAllText(Path.Combine("GeneratedDoc", "doku.dot"), dotGenerator.GenerateCode(result));
+
+            // Zusammenfassen für schnelle Nutzung
+
+            ResultFileFinisher.AggregateDrops("GeneratedSQL");          
+            ResultFileFinisher.AggregateCreates("GeneratedSQL");
 
             Console.WriteLine();
         }
