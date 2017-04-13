@@ -145,11 +145,11 @@ interface Bewerberstatus : DimTable(mandant=true) {
 }
 
 // Hauptverfahren, Nachrückverfahren etc. Phasen von DoSV???
-interface Zulassungsart : DimTable(mandant=true) {
+interface Zulassungsart : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
-    base HISKEY_ID:varchar(len="50");  
+    base HISKEY_ID:varchar(len="50");  // Evtl. noch rausnehmen, die gibts hier ja nicht!
 }
 
 interface Zulassungsquote : DimTable(mandant=true) {
