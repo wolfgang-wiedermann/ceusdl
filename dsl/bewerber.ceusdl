@@ -152,12 +152,6 @@ interface Zulassungsart : DefTable {
     base HISKEY_ID:varchar(len="50");  // Evtl. noch rausnehmen, die gibts hier ja nicht!
 }
 
-interface Zulassungsquote : DimTable(mandant=true) {
-    base KNZ:varchar(len="50", primary_key="true");
-    base KURZBEZ:varchar(len="100");
-    base LANGBEZ:varchar(len="500");    
-}
-
 //
 // Herkunft - GeoAttribute
 //
@@ -183,6 +177,7 @@ interface Bundesland : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
     base Laengengrad:varchar(len="50");
     base Breitengrad:varchar(len="50");    
     ref Land.KNZ;
@@ -192,6 +187,7 @@ interface Regierungsbezirk : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");    
+    base AMT_ID:varchar(len="50");
     base Laengengrad:varchar(len="50");
     base Breitengrad:varchar(len="50");
     ref Bundesland.KNZ;
@@ -201,6 +197,7 @@ interface Kreis : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
+    base AMT_ID:varchar(len="50");
     base Laengengrad:varchar(len="50");
     base Breitengrad:varchar(len="50");
     ref Bundesland.KNZ;
@@ -211,7 +208,7 @@ interface Ort : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
-    base Postleitzahl:varchar(len="5");
+    base Postleitzahl:varchar(len="5");    
     base Laengengrad:varchar(len="50");
     base Breitengrad:varchar(len="50");
     ref Kreis.KNZ;
@@ -293,8 +290,8 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
 
     ref Semester.KNZ;
 
-    ref HZBArt.KNZ;
-    ref HZBNote.KNZ;
+    ref HZBArt.KNZ; // Muss dann höchste HZB werden, denn lt. Andreas kann ein Bewerber mehrere HZBs haben
+    ref HZBNote.KNZ; // Muss dann die Note der höchsten HZB sein ... siehe oben ...
     ref Jahr.KNZ as HZBJahr; // HZB_Jahr
 
     ref Kreis.KNZ as HZBKreis; // HZB_Kreis
@@ -320,11 +317,11 @@ interface Antrag : FactTable(mandant=true, history=Tag.KNZ) {
     ref StudiengangHisInOne.KNZ;
     ref Antragsfachstatus.KNZ;
     ref JaNein.KNZ as Zulassung; // Zulassung_JaNein
-    ref Zulassungsart.KNZ;
-    ref Zulassungsquote.KNZ;
+    ref Zulassungsart.KNZ;    
     ref HochschulSemester.KNZ;
     ref FachSemester.KNZ;
     ref Wartehalbjahre.KNZ;
+    //ref HZBArt.KNZ as EffektiveHZB; // TODO: Lt. Andreas kann ein Bewerber mehrere HZBs haben.
 
     ref JaNein.KNZ as DoSVBewerbung; // DoSVBewerbung_JaNein
 

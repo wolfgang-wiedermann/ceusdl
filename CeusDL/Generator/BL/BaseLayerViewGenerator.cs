@@ -106,10 +106,8 @@ namespace Kdv.CeusDL.Generator.BL {
             code += $"\n        when bl.{ifa.Name}_ID is null then 'I'";
 
             // alle Felder, die nicht PK sind hier berücksichtigen
-            var fields = ifa.Attributes.Where(a => a is InterfaceBasicAttribute)
-                                       .Select(a => (InterfaceBasicAttribute)a)
-                                       .Where(a => a.PrimaryKey == false)
-                                       .ToList<InterfaceBasicAttribute>();
+            var fields = ifa.Attributes.Where(a => a.PrimaryKey == false)
+                                       .ToList();
             // Evtl. fehlen hier noch die InterfaceRefAttribute => die könnten auch relevant sein!
 
             if(fields.Count > 0) {
