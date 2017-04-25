@@ -291,6 +291,8 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
     ref Semester.KNZ;
 
     ref HZBArt.KNZ; // Muss dann höchste HZB werden, denn lt. Andreas kann ein Bewerber mehrere HZBs haben
+                    // die höchste HZB kann ich mit min(HZBArt_AMT_ID) ermitteln!
+                    
     ref HZBNote.KNZ; // Muss dann die Note der höchsten HZB sein ... siehe oben ...
     ref Jahr.KNZ as HZBJahr; // HZB_Jahr
 
