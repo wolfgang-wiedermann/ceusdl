@@ -292,6 +292,8 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
 
     ref HZBArt.KNZ; // Muss dann höchste HZB werden, denn lt. Andreas kann ein Bewerber mehrere HZBs haben
                     // die höchste HZB kann ich mit min(HZBArt_AMT_ID) ermitteln!
+    
+    base AnzahlHZBs:int; // Anzahl der HZBs, die der Bewerber angegeben hat.
                     
     ref HZBNote.KNZ; // Muss dann die Note der höchsten HZB sein ... siehe oben ...
     ref Jahr.KNZ as HZBJahr; // HZB_Jahr
@@ -302,7 +304,7 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
 
     ref Bewerberstatus.KNZ;
 
-    ref JaNein.KNZ as DoSVBewerber; // DoSVBewerber_JaNein
+    ref JaNein.KNZ as DoSVBewerber; // DoSVBewerber_JaNein    
 
     // Fakten
     fact Anzahl_F:decimal(len="1,0"); // ein default="1" wäre hier noch nett
@@ -326,6 +328,7 @@ interface Antrag : FactTable(mandant=true, history=Tag.KNZ) {
     //ref HZBArt.KNZ as EffektiveHZB; // TODO: Lt. Andreas kann ein Bewerber mehrere HZBs haben.
 
     ref JaNein.KNZ as DoSVBewerbung; // DoSVBewerbung_JaNein
+    ref JaNein.KNZ as Zweitstudienbewerber; // Bewerbung um Zweitstudium !!
 
     // Fakten
     fact Anzahl_F:decimal(len="1,0"); // ein default="1" wäre hier noch nett
