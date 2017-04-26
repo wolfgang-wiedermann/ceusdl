@@ -72,8 +72,10 @@ namespace ConsoleApplication
             var blDropGenerator = new BaseLayerDropGenerator();
             File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Drop.sql"), blDropGenerator.GenerateCode(result));
 
-            var blGenerator = new BaseLayerGenerator();
+            var blGenerator = new BaseLayerGenerator();            
             File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Create.sql"), blGenerator.GenerateCode(result));
+            var blInitialGenerator = new BaseLayerInitialValueGenerator();
+            File.AppendAllText(Path.Combine("GeneratedSQL", "BL_Create.sql"), "\ngo\n\n"+blInitialGenerator.GenerateCode(result));
 
             var blLGenerator = new BaseLayerLoadGenerator();
             File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Load.sql"), blLGenerator.GenerateCode(result));
