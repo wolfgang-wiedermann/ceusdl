@@ -6,7 +6,7 @@ using Kdv.CeusDL.Parser.TmpModel;
 namespace Kdv.CeusDL.Parser.Model {
 
     public enum ConfigItemEnum {
-        PREFIX, IL_DATABASE, BL_DATABASE, BT_DATABASE, AL_DATABASE
+        PREFIX, IL_DATABASE, BL_DATABASE, BT_DATABASE, AL_DATABASE, PROD_DB_SERVER, ETL_DB_SERVER     
     }
 
     public class ConfigItem {
@@ -32,6 +32,10 @@ namespace Kdv.CeusDL.Parser.Model {
                     return ConfigItemEnum.BT_DATABASE;
                 case "al_database":
                     return ConfigItemEnum.AL_DATABASE;
+                case "prod_db_server":
+                    return ConfigItemEnum.PROD_DB_SERVER;
+                case "etl_db_server":
+                    return ConfigItemEnum.ETL_DB_SERVER;
                 default:
                     throw new InvalidDataException($"Ungültiges ConfigItem {item.Name}");
             }

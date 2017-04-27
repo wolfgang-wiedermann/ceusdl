@@ -42,6 +42,13 @@ namespace Kdv.CeusDL.Generator.AL {
             return "";
         }
 
+        public string GetALDatabaseName(ParserResult model) {
+            if(model.Config.HasValueFor(ConfigItemEnum.AL_DATABASE)) {
+                return $"[{model.Config.GetValue(ConfigItemEnum.AL_DATABASE)}].";
+            } 
+            return "";        
+        }
+
         public List<Interface> GetFactTables(ParserResult model) {
             return model.Interfaces.Where(i => i.Type == InterfaceType.FACT_TABLE).ToList<Interface>();
         }      

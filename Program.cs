@@ -102,6 +102,9 @@ namespace ConsoleApplication
             var alLoadGenerator = new AnalyticalLayerLoadGenerator();
             File.WriteAllText(Path.Combine("GeneratedSQL", "AL_Load.sql"), alLoadGenerator.GenerateCode(result));
 
+            var alCopyGenerator = new AnalyticalLayerCopyGenerator();
+            File.WriteAllText(Path.Combine("GeneratedSQL", "AL_CopyToProd.sql"), alCopyGenerator.GenerateCode(result));
+
             // Dokumentation
 
             var docGenerator = new DocGenerator();

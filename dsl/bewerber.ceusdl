@@ -7,8 +7,10 @@ config {
      il_database="FH_AP_InterfaceLayer";
      bl_database="FH_AP_BaseLayer";
      bt_database="FH_AP_BaseLayer";
-     al_database="FH_AP_Warehouse";
+     al_database="FH_AP_Warehouse";     
+     etl_db_server="CEUS-ETL";
 }
+// alternativ: prod_db_server="CEUS-DB"; -> aber besser immer nur eins!
 
 // 1. Interface Definitionen
 
