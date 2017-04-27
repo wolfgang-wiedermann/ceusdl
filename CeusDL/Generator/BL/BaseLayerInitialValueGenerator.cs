@@ -12,7 +12,7 @@ namespace Kdv.CeusDL.Generator.BL {
         public override string GenerateCode(ParserResult model) 
         {
             StringBuilder sql = new StringBuilder("");            
-            foreach(Interface ifa in model.Interfaces.Where(i => i.Type != InterfaceType.DIM_VIEW && i.Type != InterfaceType.DEF_TABLE)) {
+            foreach(Interface ifa in model.Interfaces.Where(i => i.Type != InterfaceType.DIM_VIEW && i.Type != InterfaceType.FACT_TABLE)) {
                 sql.Append(GenerateDefaultInsert(ifa, model));
                 sql.Append("\n\n");
             }
