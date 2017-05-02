@@ -186,17 +186,26 @@ namespace Kdv.CeusDL.Generator.IL {
             code += $"            string sql = \"insert into {GetILDatabase(model)}.dbo.{GetPrefix(model.Config)}IL_{ifa.Name} values (\";\n";
             
             if(ifa.IsMandantInterface()) {
-                code += $"            sql += \"'\"+line.Mandant_KNZ+\"', \";";
+                code += $"            sql += \"'\"+line.Mandant_KNZ.Substring(0, line.Mandant_KNZ.Length>10?10:line.Mandant_KNZ.Length)+\"', \";\n";
             }
             i = 0;
             foreach(var attr in ifa.Attributes) {
                 i++;
-                code += $"            sql += \"'\"+line.{GetCSAttributeName(attr, ifa)}+\"'";
+                code += $"            if(!String.IsNullOrEmpty(line.{GetCSAttributeName(attr, ifa)})) {{\n";
+                code += $"                sql += \"'\"+line.{GetCSAttributeName(attr, ifa)}{GetSubstringIfNeeded(attr, ifa)}+\"'";                
                 if(i < ifa.Attributes.Count) {
                     code += ", \";\n";;
                 } else {
                     code += "\";\n";;
                 }                
+                code +=  "            } else {\n";
+                code +=  "                sql += \"''";
+                                if(i < ifa.Attributes.Count) {
+                    code += ", \";\n";;
+                } else {
+                    code += "\";\n";;
+                }                
+                code +=  "            }\n";
             }
 
             code += $"            sql += \");\";\n";
@@ -293,6 +302,21 @@ namespace Kdv.CeusDL.Generator.IL {
             string code = $"        public string {GetCSAttributeName(attr, ifa)} ";
             code += "{ get; set; }\n";
             return code;
+        }
+
+        private string GetSubstringIfNeeded(InterfaceAttribute attr, Interface ifa) {
+            if(attr is InterfaceBasicAttribute) {
+                var ba = (InterfaceBasicAttribute)attr;
+                if(ba.DataType == InterfaceAttributeDataType.VARCHAR) {
+                    return $".Substring(0, line.{GetCSAttributeName(attr, ifa)}.Length>{ba.Length}?{ba.Length}:line.{GetCSAttributeName(attr, ifa)}.Length)";
+                }
+            } else {
+                var ba = ((InterfaceRefAttribute)attr).ReferencedAttribute;
+                if(ba.DataType == InterfaceAttributeDataType.VARCHAR) {
+                    return $".Substring(0, line.{GetCSAttributeName(attr, ifa)}.Length>{ba.Length}?{ba.Length}:line.{GetCSAttributeName(attr, ifa)}.Length)";
+                }
+            }
+            return "";
         }
 
         public string GetCSAttributeName(InterfaceAttribute attr, Interface ifa) {
