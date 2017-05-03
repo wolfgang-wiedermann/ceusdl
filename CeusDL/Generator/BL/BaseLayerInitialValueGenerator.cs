@@ -31,7 +31,11 @@ namespace Kdv.CeusDL.Generator.BL {
             foreach(var attr in ifa.Attributes) {
                 sql += $", {this.GetAttributeName(attr)}";
             }
-            sql += "\n    , T_Modifikation, T_Bemerkung, T_Benutzer, T_System, T_Erst_DAT, T_Aend_DAT, T_Ladelauf_NR\n";
+            if(ifa.Type == InterfaceType.DIM_TABLE) {
+                sql += "\n    , T_Modifikation, T_Bemerkung, T_Benutzer, T_System, T_Erst_DAT, T_Aend_DAT, T_Ladelauf_NR\n";
+            } else if(ifa.Type == InterfaceType.DEF_TABLE) {
+                sql += "\n    , T_Benutzer, T_System, T_Erst_DAT, T_Aend_DAT\n";
+            }
             sql += "\n) values (\n";
             // Werteliste aufbauen
             sql += "    -1";
@@ -75,7 +79,11 @@ namespace Kdv.CeusDL.Generator.BL {
                     }
                 }
             }
-            sql += "\n    , 'I', 'Default Wert', 'INITIAL', 'D', GetDate(), GetDate(), 0\n";
+            if(ifa.Type == InterfaceType.DIM_TABLE) {
+                sql += "\n    , 'I', 'Default Wert', 'INITIAL', 'D', GetDate(), GetDate(), 0\n";
+            } else if(ifa.Type == InterfaceType.DEF_TABLE) {
+                sql += "\n    , 'INITIAL', 'D', GetDate(), GetDate()\n";
+            }
             sql += "\n)\n";
             sql += $"set identity_insert {GetBLDatabaseAndSchema(model.Config)}{GetTableName(ifa, model.Config)} off;\n";
             return sql;

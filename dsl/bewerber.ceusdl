@@ -102,6 +102,7 @@ interface Studienfach : DimView(mandant=true) {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");    
     ref StudienfachBayern.KNZ;
+    ref Fakultaet.KNZ;
 }
 
 interface Studienabschluss : DimView(mandant=true) {
@@ -109,6 +110,12 @@ interface Studienabschluss : DimView(mandant=true) {
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
     base AMT_ID:varchar(len="50");    
+}
+
+interface Fakultaet : DimView(mandant=true) {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
 }
 
 interface StudienfachBayern : DimView {
