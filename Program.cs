@@ -71,6 +71,7 @@ namespace ConsoleApplication
 
             var blDropGenerator = new BaseLayerDropGenerator();
             File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Drop.sql"), blDropGenerator.GenerateCode(result));
+            File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Drop_Views_only.sql"), blDropGenerator.GenerateDropViewOnly(result));
 
             var blGenerator = new BaseLayerGenerator();            
             File.WriteAllText(Path.Combine("GeneratedSQL", "BL_Create.sql"), blGenerator.GenerateCode(result));
