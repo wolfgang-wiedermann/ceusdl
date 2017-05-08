@@ -182,6 +182,9 @@ interface Land : DimTable(mandant=true) {
     ref Kontinent.KNZ;   
 }
 
+// Hinweis:
+// Bundesländer sind bei uns nur für Deutschland gepflegt => die Beziehung zu Land ist
+// hier nicht hilfreich, Land gehört statt dessen direkt in der Faktentabelle referenziert.
 interface Bundesland : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
@@ -189,7 +192,7 @@ interface Bundesland : DimTable(mandant=true) {
     base AMT_ID:varchar(len="50");
     base Laengengrad:varchar(len="50");
     base Breitengrad:varchar(len="50");    
-    ref Land.KNZ;
+    //ref Land.KNZ;
 }
 
 interface Regierungsbezirk : DimTable(mandant=true) {
@@ -292,7 +295,7 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
     base Bewerbernummer:varchar(len="20", primary_key="true");
     ref Tag.KNZ(primary_key="true");
 
-    base DoSV_BID:varchar(len="100"); // BID aus DoSV ???
+    base DoSV_BID:varchar(len="100"); // BID aus DoSV
     
     ref Geschlecht.KNZ;
     ref Tag.KNZ as Geburtstag;
@@ -307,8 +310,10 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
     ref HZBNote.KNZ; // Muss dann die Note der höchsten HZB sein ... siehe oben ...
     ref Jahr.KNZ as HZBJahr; // HZB_Jahr
 
-    ref Kreis.KNZ as HZBKreis; // HZB_Kreis
-    ref Ort.KNZ as Heimat; // Heimatort
+    ref Kreis.KNZ as HZBKreis; // HZB_Kreis (nur Deutschland)
+    ref Land.KNZ as HZBLand; // HZB_Land
+    ref Ort.KNZ as Heimat; // Heimatort (nur Deutschland)
+    ref Land.KNZ as HeimatLand; // Heimatland
     ref Land.KNZ as Staatsangehoerigkeit;    
 
     ref Bewerberstatus.KNZ;

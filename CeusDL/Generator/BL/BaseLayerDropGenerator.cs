@@ -29,13 +29,33 @@ namespace Kdv.CeusDL.Generator.BL {
 
             foreach(var ifa in model.Interfaces) {
                 // in der IL gibt es nur DIM_TABLE und FACT_TABLE 
-                if(ifa.Type != InterfaceType.DIM_VIEW) {
+                if(ifa.Type != InterfaceType.DIM_VIEW && ifa.Type != InterfaceType.DEF_TABLE) {
                     code += $"-- Tabelle und View zu {ifa.Name} entfernen\n";
                     code += GenerateDropView(ifa, model);
                     code += GenerateDropTable(ifa, model);
                 }
             }
             return code;            
+        }
+
+        public string GenerateDropViewOnly(ParserResult model) {
+                        string code = "--\n-- BaseLayer-Tabellen aus der Datenbank entfernen\n";
+            code += "--\n";
+
+            if(model.Config.HasValueFor(ConfigItemEnum.BL_DATABASE)) {
+                code += $"use [{model.Config.GetValue(ConfigItemEnum.BL_DATABASE)}]\nGO\n\n";
+            }
+
+            // TODO: foreach(var ifa in model.Interfaces) => GenerateDropConstraints(ifa, model)
+
+            foreach(var ifa in model.Interfaces) {
+                // in der IL gibt es nur DIM_TABLE und FACT_TABLE 
+                if(ifa.Type != InterfaceType.DIM_VIEW && ifa.Type != InterfaceType.DEF_TABLE) {
+                    code += $"-- View zu {ifa.Name} entfernen\n";
+                    code += GenerateDropView(ifa, model);                    
+                }
+            }
+            return code;  
         }
 
         private string GenerateDropTable(Interface ifa, ParserResult model)
