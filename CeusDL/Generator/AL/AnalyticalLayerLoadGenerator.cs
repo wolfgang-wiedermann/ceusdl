@@ -13,7 +13,10 @@ namespace Kdv.CeusDL.Generator.AL {
             string code = GetUseStatement(model);
 
             foreach(var factTable in factTables) {
-                code += GenerateFactTable(new AnalyticalFactTable(factTable, model), model);                
+                code += GenerateFactTable(new AnalyticalFactHistoryTable(factTable, model), model);                
+                if(factTable.IsHistorizedInterface()) {
+                      code += GenerateFactTable(new AnalyticalFactNowTable(factTable, model), model);
+                }
                 dimRepo.AddRange(GetDirectAttachedDimensions(factTable, model));                
             }
 
@@ -107,8 +110,8 @@ namespace Kdv.CeusDL.Generator.AL {
                   i++;
 
                   if(table == fact.MainInterface) {
-                        selectcode += $"\n    a.{table.Name}_ID,";
-                        code += $"\n    {table.Name}_ID,";
+                        selectcode += $"\n    a.{fact.MainInterface.Name}_ID,";
+                        code += $"\n    {fact.MainInterface.Name}_ID,";
                   }
 
                   var attrs = fact.Attributes

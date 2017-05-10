@@ -13,7 +13,10 @@ namespace Kdv.CeusDL.Generator.AL {
             string code = GetUseStatement(model);
 
             foreach(var factTable in factTables) {
-                code += GenerateDropTable(new AnalyticalFactTable(factTable, model), model);
+                code += GenerateDropTable(new AnalyticalFactHistoryTable(factTable, model), model);
+                if(factTable.IsHistorizedInterface()) {
+                    code += GenerateDropTable(new AnalyticalFactNowTable(factTable, model), model);
+                }
                 dimRepo.AddRange(GetDirectAttachedDimensions(factTable, model));
             }
 

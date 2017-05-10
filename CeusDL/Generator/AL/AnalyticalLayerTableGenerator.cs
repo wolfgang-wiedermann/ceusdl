@@ -13,7 +13,10 @@ namespace Kdv.CeusDL.Generator.AL {
             string code = GetUseStatement(model);
 
             foreach(var factTable in factTables) {
-                code += GenerateFactTable(factTable, model);                
+                code += GenerateFactTable(new AnalyticalFactHistoryTable(factTable, model), model);                
+                if(factTable.IsHistorizedInterface()) {
+                    code += GenerateFactTable(new AnalyticalFactNowTable(factTable, model), model);
+                }
                 dimRepo.AddRange(GetDirectAttachedDimensions(factTable, model));                
             }
 
@@ -47,13 +50,12 @@ namespace Kdv.CeusDL.Generator.AL {
             return code;
         }
 
-        private string GenerateFactTable(Interface factTable, ParserResult model)
+        private string GenerateFactTable(AnalyticalFactTable factTable, ParserResult model)
         {
-            var m = new AnalyticalFactTable(factTable, model);
-
+            var m = factTable;
             string code = $"-- Faktentabelle für {factTable.Name}\n";
             code += $"create table {m.Name} (\n";
-            code += $"    {factTable.Name}_ID bigint not null primary key,\n";            
+            code += $"    {factTable.MainInterface.Name}_ID bigint not null primary key,\n";            
 
             foreach(var attr in m.Attributes.Select(a => (InterfaceBasicAttribute)a)) {
                 code += $"    {attr.Name} {GetColumnType(attr)}";
