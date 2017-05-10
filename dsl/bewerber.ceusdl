@@ -146,7 +146,7 @@ interface Antragsfachstatus : DimTable(mandant=true) {
 }
 
 // request_status
-interface Bewerberstatus : DimTable(mandant=true) {
+interface Antragsstatus : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
@@ -314,9 +314,7 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
     ref Land.KNZ as HZBLand; // HZB_Land
     ref Ort.KNZ as Heimat; // Heimatort (nur Deutschland)
     ref Land.KNZ as HeimatLand; // Heimatland
-    ref Land.KNZ as Staatsangehoerigkeit;    
-
-    ref Bewerberstatus.KNZ;
+    ref Land.KNZ as Staatsangehoerigkeit;        
 
     ref JaNein.KNZ as DoSVBewerber; // DoSVBewerber_JaNein    
 
@@ -333,6 +331,7 @@ interface Antrag : FactTable(mandant=true, history=Tag.KNZ) {
     ref Bewerber.Bewerbernummer;
 
     ref StudiengangHisInOne.KNZ;
+    ref Antragsstatus.KNZ;
     ref Antragsfachstatus.KNZ;
     ref JaNein.KNZ as Zulassung; // Zulassung_JaNein
     ref Zulassungsart.KNZ;    
