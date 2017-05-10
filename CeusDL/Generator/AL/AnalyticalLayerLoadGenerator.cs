@@ -120,8 +120,12 @@ namespace Kdv.CeusDL.Generator.AL {
 
                   foreach(var attr in attrs) {                                                
                         if(table == fact.MainInterface) {
-                              selectcode += $"\n    a.{attr.Name} as {attr.Name}";                              
-                        } else {
+                              if(attr?.ParentAttribute is InterfaceFact) {
+                                    selectcode += $"\n    a.{blGenerator.GetAttributeName(attr.ParentAttribute)} as {attr.Name}";
+                              } else {
+                                    selectcode += $"\n    a.{attr.Name} as {attr.Name}";
+                              }
+                        } else {                              
                               selectcode += $"\n    t{i}.{attr.Name} as {attr.Name}";
                         }
                         code += $"\n    {attr.Name}";
@@ -140,6 +144,14 @@ namespace Kdv.CeusDL.Generator.AL {
                         joincode += $"   on a.{table.Name}_ID = t{i}.{table.Name}_ID\n";
                   }
             }
+
+            // Wenn es eine Ist-Stand-Tabelle zu einer Verlaufs-Tabelle ist, dann
+            if(fact is AnalyticalFactNowTable) {
+                  var timeAttr = fact.MainInterface.GetHistoryAttribute();
+                  var timeAttrName = this.GetColumnName(timeAttr, timeAttr.ParentInterface, model);
+                  joincode += $"where a.{timeAttrName} = (select max({timeAttrName}) from {GetBTDatabaseIfExists(model)}[dbo].[{btGenerator.GetTableName(fact.MainInterface, model.Config)}])\n";
+            }
+
             code += ")\n";
             code += selectcode;
             code += joincode;

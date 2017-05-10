@@ -7,6 +7,7 @@ namespace Kdv.CeusDL.Generator.AL {
     public abstract class AnalyticalLayerAbstractGenerator : IGenerator
     {
         protected BL.BaseLayerTableGenerator blGenerator = new BL.BaseLayerTableGenerator();
+        protected BT.BaseLayerTransTableGenerator btGenerator = new BT.BaseLayerTransTableGenerator();
         public abstract string GenerateCode(ParserResult model);
 
         protected object GetTableName(Interface ifa, Config conf)

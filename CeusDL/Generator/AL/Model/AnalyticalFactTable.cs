@@ -29,6 +29,7 @@ namespace Kdv.CeusDL.Generator.AL {
                         DataType=basic.DataType,
                         PrimaryKey=basic.PrimaryKey,
                         ParentInterface=basic.ParentInterface,
+                        ParentAttribute=attr,
                         Length=basic.Length,
                         Decimals=basic.Decimals, 
                         Unit=basic.Unit
@@ -48,7 +49,8 @@ namespace Kdv.CeusDL.Generator.AL {
                         Name=(string.IsNullOrEmpty(refAttr.Alias)?"":refAttr.Alias+"_")+$"{refTable.Name}_ID",
                         DataType=InterfaceAttributeDataType.INT,
                         PrimaryKey=false,
-                        ParentInterface=baseTable
+                        ParentInterface=baseTable,
+                        ParentAttribute=attr
                     });
 
                     if(refAttr.ReferencedAttribute.ParentInterface.Type == InterfaceType.FACT_TABLE) {
