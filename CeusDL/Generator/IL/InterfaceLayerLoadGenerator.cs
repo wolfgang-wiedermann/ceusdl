@@ -192,7 +192,7 @@ namespace Kdv.CeusDL.Generator.IL {
             foreach(var attr in ifa.Attributes) {
                 i++;
                 code += $"            if(!String.IsNullOrEmpty(line.{GetCSAttributeName(attr, ifa)})) {{\n";
-                code += $"                sql += \"'\"+line.{GetCSAttributeName(attr, ifa)}{GetSubstringIfNeeded(attr, ifa)}+\"'";                
+                code += $"                sql += \"'\"+line.{GetCSAttributeName(attr, ifa)}{GetSubstringIfNeeded(attr, ifa)}.Replace(\"'\", \"''\")+\"'";                
                 if(i < ifa.Attributes.Count) {
                     code += ", \";\n";;
                 } else {
