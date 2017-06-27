@@ -36,6 +36,8 @@ interface HochschulSemester : DefTable {
     base LANGBEZ:varchar(len="500");
 }
 
+// TODO: Markierung des Feingranularsten Zeit-Attributs einführen
+// z. B. interface Tag : DefTable(finest_time_attribute="true") {
 interface Tag : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
@@ -327,6 +329,7 @@ interface Antrag : FactTable(mandant=true, history=Tag.KNZ) {
     // Attribute
     base Antragsnummer:varchar(len="20", primary_key="true");    
     ref Tag.KNZ(primary_key="true"); 
+    ref Semester.KNZ;
 
     ref Bewerber.Bewerbernummer;
 
