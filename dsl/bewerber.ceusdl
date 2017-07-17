@@ -42,8 +42,15 @@ interface Tag : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
+    ref TagOhneJahr.KNZ;
     ref Woche.KNZ;    
-    ref Monat.KNZ;
+    ref Monat.KNZ;    
+}
+
+interface TagOhneJahr : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");    
 }
 
 interface Woche : DefTable {
@@ -57,7 +64,14 @@ interface Monat : DefTable {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
+    ref MonatOhneJahr.KNZ;
     ref Jahr.KNZ;
+}
+
+interface MonatOhneJahr : DefTable {
+    base KNZ:varchar(len="50", primary_key="true");
+    base KURZBEZ:varchar(len="100");
+    base LANGBEZ:varchar(len="500");
 }
 
 interface Jahr : DefTable {
