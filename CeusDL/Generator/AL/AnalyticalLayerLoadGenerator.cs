@@ -149,7 +149,11 @@ namespace Kdv.CeusDL.Generator.AL {
             if(fact is AnalyticalFactNowTable) {
                   var timeAttr = fact.MainInterface.GetHistoryAttribute();
                   var timeAttrName = this.GetColumnName(timeAttr, timeAttr.ParentInterface, model);
-                  joincode += $"where a.{timeAttrName} = (select max({timeAttrName}) from {GetBTDatabaseIfExists(model)}[dbo].[{btGenerator.GetTableName(fact.MainInterface, model.Config)}])\n";
+                  if(fact.MainInterface.IsMandantInterface()) {
+                        joincode += $"where a.{timeAttrName} = (select max(x.{timeAttrName}) from {GetBTDatabaseIfExists(model)}[dbo].[{btGenerator.GetTableName(fact.MainInterface, model.Config)}] as x where x.Mandant_ID = a.Mandant_ID)\n";
+                  } else {
+                        joincode += $"where a.{timeAttrName} = (select max({timeAttrName}) from {GetBTDatabaseIfExists(model)}[dbo].[{btGenerator.GetTableName(fact.MainInterface, model.Config)}])\n";
+                  }
             }
 
             code += ")\n";
