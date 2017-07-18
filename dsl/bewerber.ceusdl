@@ -158,7 +158,7 @@ interface Antragsfachstatus : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
-    base HISKEY_ID:varchar(len="50");
+    base HISKEY_ID:int;
 }
 
 // request_status
@@ -166,7 +166,7 @@ interface Antragsstatus : DimTable(mandant=true) {
     base KNZ:varchar(len="50", primary_key="true");
     base KURZBEZ:varchar(len="100");
     base LANGBEZ:varchar(len="500");
-    base HISKEY_ID:varchar(len="50");
+    base HISKEY_ID:int;
 }
 
 // Hauptverfahren, Nachrückverfahren etc. Phasen von DoSV???
