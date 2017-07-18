@@ -128,10 +128,10 @@ namespace Kdv.CeusDL.Generator.BL {
 
         private string GenerateMandantParamCode()
         {
-            string code = "DECLARE @mandant varchar(10);\n";
-            code += "DECLARE @ladelauf_nr int;\n";
-            code += "SET @mandant = '0000';\n";
-            code += "SET @ladelauf_nr = 1;\n\n";
+            string code = "-- DECLARE @mandant varchar(10);\n";
+            code += "-- DECLARE @ladelauf_nr int;\n";
+            code += "-- SET @mandant = '0000';\n";
+            code += "-- SET @ladelauf_nr = 1;\n\n";
             return code;
         }
     }
