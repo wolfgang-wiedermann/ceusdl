@@ -1,5 +1,5 @@
-CEUS Definition Language
-========================
+Prototyp: CEUS Definition Language (ceusdl)
+===========================================
 
 Prototyp einer Sprache zur Definition von Relationalen OLAP-Systemen.
 
