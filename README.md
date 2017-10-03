@@ -1,7 +1,13 @@
 Prototyp: CEUS Definition Language (ceusdl)
 ===========================================
 
-Prototyp einer Sprache zur Definition von Relationalen OLAP-Systemen.
+Bei dem hier vorliegenden Code handelt es sich um den __Prototypen einer Sprache zur Definition und Generierung von Data-Warehouse-Systemen__.
+Das Ziel der Sprache ist es, alle für die systematische Archivierung und Aufbereitung der Daten erforderlichen Artefakte auf der Basis
+eines Best-Practice-Ansatzes zu generieren. Die Zieltechnologien des Prototypen sind Microsoft SQL Server und Microsoft .Net Core. Folglich wird
+das generierte Modell als ein, auf relationalen Datenbanken basierendes Data-Warehouse-System generiert.  
+
+__Bitte beachten Sie, dass es inzwischen eine noch nicht öffentliche Implementierung von ceusdl gibt, die sich noch in Entwicklung befindet 
+und verschiedene im Prototyp noch nicht berücksichtigte Features, wie z. B. die Historisierung von Attributwerten in DimTables etc. umsetzt.__
 
 Funktionsumfang:
 ----------------
@@ -51,4 +57,35 @@ interface Student : FactTable(mandant=true, history=Semester.KNZ) {
     fact Anzahl_F:int;       // immer 1
     fact CreditPoints_F:int; // Anzahl der bis zum angegebenen Semester erworbenen Creditpoints
 }
+```
+
+## Installation
+
+Die (testweise) Nutzung von ceusdl setzt die folgenden Werkzeuge voraus und ist auf Windows, MacOS und Linux (getestet mit Ubuntu 16.04) möglich:
+
+* git (siehe https://git-scm.com/downloads)
+* .net core SDK (https://www.microsoft.com/net/download/core)
+* Visual Studio Code (https://code.visualstudio.com/download)
+
+Bitte beachten Sie, dass der Prototyp in keiner Weise hinsichtlich einer komfortablen Benutzung optimiert ist. Das ist Aufgabe der bereits angesprochenen produktiven Implementierung.
+
+Um den Prototypen zu testen installieren Sie die genannten Tools und führen Sie anschließend
+die folgenden Aufrufe in einem Consolenfenster aus.
+
+```
+mkdir ceusdl
+cd ceusdl
+git init
+git remote add origin https://github.com/wolfgang-wiedermann/ceusdl.git
+git pull origin master
+dotnet restore
+dotnet build
+
+# Mit dotnet run können Sie nun die Übersetzung der Datei bewerber.ceusdl anstoßen
+dotnet run
+
+# Mit code . können Sie das Projekt in Visual Studio Code öffnen
+# (Achtung, beim ersten Mal kann es etwas dauern, bis die .Net Core-Integration
+#  vollständig nachgeladen ist)
+code .
 ```
