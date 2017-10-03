@@ -118,5 +118,5 @@ Data-Warehouse-Systeme auf der CEUS-Plattform der KDV betreiben zu können. Also
 
 Generell ist das Konzept - auch wenn die Implementierung der Generatoren dies derzeit vorsieht - nicht auf Data-Warehouse-Systeme mit relationalen
 Datenbanken beschränkt. Das Sprachkonzept gibt ohne größere Änderungen auch die Generierung des Codes für andere Zielplattformen, wie z. B. einer
-Lambda-Architektur auf der Basis von Hadoop zu. Das ist auch der Grund, warum für die Spezifikation der verwendeten Entitäten das Schlüsselwort
+Lambda-Architektur auf der Basis von Hadoop oder Apache Kafka zu. Das ist auch der Grund, warum für die Spezifikation der verwendeten Entitäten das Schlüsselwort
 interface und nicht table verwendet wird.
