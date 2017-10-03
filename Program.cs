@@ -38,9 +38,6 @@ namespace ConsoleApplication
                 throw new Exception("Parsing-Vorgang mit Fehler abgebrochen ....");
             }
 
-            var ddGenerator = new DemoDataGenerator();
-            ddGenerator.GenerateCode(result);
-
             // Falls die Ausgabeverzeichnisse noch nicht existieren dann anlegen...
 
             if(!Directory.Exists("GeneratedSQL")) {
@@ -55,6 +52,9 @@ namespace ConsoleApplication
             if(!Directory.Exists("GeneratedDoc")) {
                 Directory.CreateDirectory("GeneratedDoc");
             }
+
+            var ddGenerator = new DemoDataGenerator();
+            ddGenerator.GenerateCode(result);
 
             // Interface Layer
             
