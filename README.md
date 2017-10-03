@@ -105,6 +105,18 @@ Der hier vorliegende Prototyp wurde bereits erfolgreich für die Entwicklung des
 Mai 2017 mit 4 Pilothochschulen im Einsatz befindet. Die Datei bewerber.ceusdl (siehe https://github.com/wolfgang-wiedermann/ceusdl/blob/master/dsl/bewerber.ceusdl) beinhaltet den vollständigen ceusdl-Code dieses Systems und kann somit als
 praxiserprobtes Beispiel für die Tauglichkeit des Konzepts hinter ceusdl angesehen werden.
 
+Das kurzfristige Ziel, mit der Sprache Entwicklungsaufwand seitens der KDV zu reduzieren (insb. hinsichtlich einer systematischen und konsistenten Weiterentwicklung der Systeme) wird durch die Sprache erfüllt. Ein parallel ausgeführtes Entwicklungsprojekt von CEUS AP mit klassischen mitteln hat
+sich als zeitaufwändiger erwiesen als die Entwicklung mit ceusdl incl. der gleichzeitigen Fertigstellung des ceusdl-Prototypen.
+
 ## Zielsetzung
 
-Das langfristige Ziel hinter der Entwicklung dieser Sprache ist
+Das mittelfristige Ziel der Entwicklung dieser Sprache ist es, den bayerischen Hochschulen neben den bestehenden, von der KDV gepflegten 
+Data-Warehouse-Systemen die Möglichkeit zu verschaffen, über eine webbasierte Entwicklungsumgebung auch eigene, völlig frei gestaltbare
+Data-Warehouse-Systeme auf der CEUS-Plattform der KDV betreiben zu können. Also eine Data-Warehouse-as-a-Service-Plattform für die Hochschulen.
+
+## Anmerkung
+
+Generell ist das Konzept - auch wenn die Implementierung der Generatoren dies derzeit vorsieht - nicht auf Data-Warehouse-Systeme mit relationalen
+Datenbanken beschränkt. Das Sprachkonzept gibt ohne größere Änderungen auch die Generierung des Codes für andere Zielplattformen, wie z. B. einer
+Lambda-Architektur auf der Basis von Hadoop zu. Das ist auch der Grund, warum für die Spezifikation der verwendeten Entitäten das Schlüsselwort
+interface und nicht table verwendet wird.
