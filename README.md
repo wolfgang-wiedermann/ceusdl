@@ -102,11 +102,11 @@ code .
 ## Status
 
 Der hier vorliegende Prototyp wurde bereits erfolgreich für die Entwicklung des Systems CEUS AP (Applicants/Studienbewerber) eingesetzt, das sich seit
-Mai 2017 mit 4 Pilothochschulen im Einsatz befindet. Die Datei bewerber.ceusdl (siehe https://github.com/wolfgang-wiedermann/ceusdl/blob/master/dsl/bewerber.ceusdl) beinhaltet den vollständigen ceusdl-Code dieses Systems und kann somit als
+Mai 2017 mit 4 Pilothochschulen im produktiven Betrieb befindet. Die Datei bewerber.ceusdl (siehe https://github.com/wolfgang-wiedermann/ceusdl/blob/master/dsl/bewerber.ceusdl) beinhaltet den vollständigen ceusdl-Code dieses Systems und kann somit als
 praxiserprobtes Beispiel für die Tauglichkeit des Konzepts hinter ceusdl angesehen werden.
 
-Das kurzfristige Ziel, mit der Sprache Entwicklungsaufwand seitens der KDV zu reduzieren (insb. hinsichtlich einer systematischen und konsistenten Weiterentwicklung der Systeme) wird durch die Sprache erfüllt. Ein parallel ausgeführtes Entwicklungsprojekt von CEUS AP mit klassischen mitteln hat
-sich als zeitaufwändiger erwiesen als die Entwicklung mit ceusdl incl. der gleichzeitigen Fertigstellung des ceusdl-Prototypen.
+Das kurzfristige Ziel, mit der Sprache Entwicklungsaufwand seitens der KDV zu reduzieren (insb. hinsichtlich einer systematischen und konsistenten Weiterentwicklung der Systeme) wird durch die Sprache erfüllt. Ein parallel ausgeführtes Entwicklungsprojekt von CEUS AP mit klassischen Mitteln hat
+sich als deutlich zeitaufwändiger erwiesen, als die Entwicklung mit ceusdl incl. der gleichzeitigen Fertigstellung des ceusdl-Prototypen.
 
 ## Zielsetzung
 
@@ -117,6 +117,11 @@ Data-Warehouse-Systeme auf der CEUS-Plattform der KDV betreiben zu können. Also
 ## Anmerkung
 
 Generell ist das Konzept - auch wenn die Implementierung der Generatoren dies derzeit vorsieht - nicht auf Data-Warehouse-Systeme mit relationalen
-Datenbanken beschränkt. Das Sprachkonzept gibt ohne größere Änderungen auch die Generierung des Codes für andere Zielplattformen, wie z. B. einer
-Lambda-Architektur auf der Basis von Hadoop oder Apache Kafka zu. Das ist auch der Grund, warum für die Spezifikation der verwendeten Entitäten das Schlüsselwort
+Datenbanken beschränkt. Das Sprachkonzept erlaubt ohne größere Änderungen auch die Generierung des Codes für andere Zielplattformen, wie z. B. eine
+Lambda-Architektur auf der Basis von Hadoop oder Apache Kafka. Hierfür wäre nur ein neuer Code-Generator zu implementieren.
+Die vielen möglichen Zielplattformen sind auch der Grund, warum für die Spezifikation der verwendeten Entitäten das Schlüsselwort
 interface und nicht table verwendet wird.
+
+## Weiterentwicklung
+
+Die Weiterentwicklung dieses Konzeptes erfolgt im Repository https://github.com/wolfgang-wiedermann/ceusdl2
