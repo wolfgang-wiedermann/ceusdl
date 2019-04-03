@@ -90,6 +90,8 @@ namespace Kdv.CeusDL.Parser {
             var attr = new InterfaceRefAttribute(input.ForeignInterface, input.ReferencedField);
             attr.Alias = input.As;
             
+            attr.Calculated = "true".Equals(input.Calculated);
+            
             if(input.PrimaryKey == "true") {
                 attr.PrimaryKey = true;
             } else {

@@ -116,6 +116,12 @@ namespace Kdv.CeusDL.Parser
                     case IN_INTERFACE_REFATTR_PARAM_PK_VALUE:
                         onInInterfaceRefattrParamPkValue(i, code);
                         break;
+                    case IN_INTERFACE_REFATTR_PARAM_CALC:
+                        onInInterfaceRefattrParamCalc(i, code);
+                        break;                        
+                    case IN_INTERFACE_REFATTR_PARAM_CALC_VALUE:
+                        onInInterfaceRefattrParamCalcValue(i, code);
+                        break;
                     default:
                         Console.WriteLine($"Reached unhandled State {state}");
                         return null;
@@ -487,9 +493,18 @@ namespace Kdv.CeusDL.Parser
         }
 
         private void onBehindInterfaceParamList(int pos, string code) {
-            char c = code[pos];
-            if(c == ';') {
+            char c = code[pos];            
+            if(c == ';' && buf.Length == 0) {
                 this.state = IN_INTERFACE_BODY;
+            } else if(!IsWhitespaceChar(c)) {
+                buf += c;
+            } else if("as".Equals(buf) && IsWhitespaceChar(c)) {
+                buf = "";
+                this.state = IN_INTERFACE_ATTRIBUTE_ALIAS;
+            } else if(IsWhitespaceChar(c) && buf.Length > 0) {
+                var tmp = buf;
+                buf = "";
+                throw new InvalidTokenException(tmp);                
             }
         }
 
@@ -570,6 +585,10 @@ namespace Kdv.CeusDL.Parser
                         buf = "";
                         this.state = IN_INTERFACE_REFATTR_PARAM_PK;
                         break;
+                    case "calculated":
+                        buf = "";
+                        this.state = IN_INTERFACE_REFATTR_PARAM_CALC;
+                        break;
                     default:
                         throw new InvalidTokenException(buf);
                 }
@@ -597,12 +616,39 @@ namespace Kdv.CeusDL.Parser
             }
         }
 
+        private void onInInterfaceRefattrParamCalc(int pos, string code) {
+            char c = code[pos];
+            if(c == ',') {
+                this.state = IN_INTERFACE_REFATTR_PARAM_LIST;
+            } else if(c == ')') {
+                this.state = BEHIND_INTERFACE_PARAM_LIST;
+            } else if(c == '"') {
+                this.state = IN_INTERFACE_REFATTR_PARAM_CALC_VALUE;
+            } else if(!IsWhitespaceChar(c)) {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
         private void onInInterfaceRefattrParamPkValue(int pos, string code) {
             char c = code[pos];
             if(c == '"' && buf.Length > 0) {
                 Log($"Primary Key  : {buf}");
                 this.state = IN_INTERFACE_REFATTR_PARAM_PK;
                 this.currentInterfaceAttribute.PrimaryKey = buf;
+                buf = "";
+            } else if(IsValidLetter(c)) {
+                buf += c;
+            } else {
+                throw new InvalidCharacterException(c);
+            }
+        }
+
+        private void onInInterfaceRefattrParamCalcValue(int pos, string code) {
+            char c = code[pos];
+            if(c == '"' && buf.Length > 0) {
+                Log($"Calculated  : {buf}");
+                this.state = IN_INTERFACE_REFATTR_PARAM_CALC;
+                this.currentInterfaceAttribute.Calculated = buf;
                 buf = "";
             } else if(IsValidLetter(c)) {
                 buf += c;

@@ -15,6 +15,7 @@ namespace Kdv.CeusDL.Parser.TmpModel
         public string DataType {get;set;}
         public string Length {get;set;}
         public string PrimaryKey {get;set;}
+        public string Calculated {get; set;}
         public string Unit {get;set;}
         // For REF-Attributes only
         public string ForeignInterface {get;set;}

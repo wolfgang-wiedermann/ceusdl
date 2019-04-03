@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Linq;
 using Kdv.CeusDL.Parser.Model;
 
 namespace Kdv.CeusDL.Generator.IL {    
@@ -103,10 +104,10 @@ namespace Kdv.CeusDL.Generator.IL {
             }
 
             int i = 0;
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.Attributes.Where(a => !a.Calculated)) {
                 i++;
                 code += "IN_"+GetCSAttributeName(attr, ifa).ToUpper();
-                if(i < ifa.Attributes.Count) {
+                if(i < ifa.Attributes.Where(a => !a.Calculated).Count()) {
                     code += ", ";
                 } else {
                     code += ", FINAL\n";
@@ -124,7 +125,7 @@ namespace Kdv.CeusDL.Generator.IL {
             if(ifa.IsMandantInterface()) {
                 code += "        public string Mandant_KNZ { get; set; }\n";
             }
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.Attributes.Where(a => !a.Calculated)) {
                 code += CreateCSAttribute(attr, ifa);
             }
             code += "    }\n\n";
@@ -189,18 +190,18 @@ namespace Kdv.CeusDL.Generator.IL {
                 code += $"            sql += \"'\"+line.Mandant_KNZ.Substring(0, line.Mandant_KNZ.Length>10?10:line.Mandant_KNZ.Length)+\"', \";\n";
             }
             i = 0;
-            foreach(var attr in ifa.Attributes) {
+            foreach(var attr in ifa.Attributes.Where(a => !a.Calculated)) {
                 i++;
                 code += $"            if(!String.IsNullOrEmpty(line.{GetCSAttributeName(attr, ifa)})) {{\n";
                 code += $"                sql += \"'\"+line.{GetCSAttributeName(attr, ifa)}{GetSubstringIfNeeded(attr, ifa)}.Replace(\"'\", \"''\")+\"'";                
-                if(i < ifa.Attributes.Count) {
+                if(i < ifa.Attributes.Where(a => !a.Calculated).Count()) {
                     code += ", \";\n";;
                 } else {
                     code += "\";\n";;
                 }                
                 code +=  "            } else {\n";
                 code +=  "                sql += \"''";
-                                if(i < ifa.Attributes.Count) {
+                                if(i < ifa.Attributes.Where(a => !a.Calculated).Count()) {
                     code += ", \";\n";;
                 } else {
                     code += "\";\n";;
@@ -246,11 +247,11 @@ namespace Kdv.CeusDL.Generator.IL {
 
             }
 
-            for(i = 0; i < ifa.Attributes.Count; i++) {
+            for(i = 0; i < ifa.Attributes.Where(a => !a.Calculated).Count(); i++) {
                 InterfaceAttribute nextAttr = null;
-                var attr = ifa.Attributes[i];
-                if(i+1 < ifa.Attributes.Count) {
-                    nextAttr = ifa.Attributes[i+1];
+                var attr = ifa.Attributes.Where(a => !a.Calculated).ToArray()[i];
+                if(i+1 < ifa.Attributes.Where(a => !a.Calculated).Count()) {
+                    nextAttr = ifa.Attributes.Where(a => !a.Calculated).ToArray()[i+1];
                 }
 
                 code += $"                    case {ifa.Name}ParserState.IN_{GetCSAttributeName(attr, ifa).ToUpper()}:\n";

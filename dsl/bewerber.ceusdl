@@ -342,8 +342,10 @@ interface Bewerber : FactTable(mandant=true, history=Tag.KNZ) {
 interface Antrag : FactTable(mandant=true, history=Tag.KNZ) {
     // Attribute
     base Antragsnummer:varchar(len="20", primary_key="true");    
-    ref Tag.KNZ(primary_key="true"); 
+    ref Tag.KNZ(primary_key="true");     
     ref Semester.KNZ;
+
+    ref Tag.KNZ(calculated="true") as Eingang; // Calculated-Attribut: siehe Bug 2598
 
     ref Bewerber.Bewerbernummer;
 
